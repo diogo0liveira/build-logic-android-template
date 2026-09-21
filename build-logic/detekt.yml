@@ -1,0 +1,39 @@
+config:
+  validation: true
+  warningsAsErrors: false
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+
+# Configuração recomendada do detekt para projetos Compose
+# Veja: https://detekt.dev/docs/introduction/compose
+naming:
+  FunctionNaming:
+    # Permitir PascalCase para funções @Composable que retornam Unit.
+    ignoreAnnotated:
+      - 'Composable'
+  TopLevelPropertyNaming:
+    # Estilo Compose: PascalCase para constantes de nível superior (ex: FooPadding em vez de FOO_PADDING).
+    constantPattern: '[A-Z][A-Za-z0-9]*'
+
+complexity:
+  LongParameterList:
+    # Composables geralmente têm muitos parâmetros com valores padrão.
+    ignoreDefaultParameters: true
+  TooManyFunctions:
+    # Não contar funções @Preview para o limite.
+    ignoreAnnotatedFunctions:
+      - 'Preview'
+
+style:
+  MagicNumber:
+    # Permitir declarações no estilo Color(0xFF000000).
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+  UnusedPrivateFunction:
+    # Não sinalizar composables @Preview como não utilizados.
+    ignoreAnnotated:
+      - 'Preview'
