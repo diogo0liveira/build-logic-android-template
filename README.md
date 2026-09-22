@@ -1,4 +1,5 @@
 # Build Logic Android Template
+[![CI](https://github.com/diogo0liveira/build-logic-android-template/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/diogo0liveira/build-logic-android-template/actions/workflows/ci.yml)
 
 O foco principal deste repositório é o **`build-logic`**, que centraliza toda a configuração de build (Gradle) do projeto. Os demais módulos incluídos (`:app`, `:module-feature`, `:module-core`, `:module-jvm`, etc.) servem apenas como **exemplos e playground** para demonstrar como consumir e aplicar estes plugins de conveniência.
 
@@ -26,24 +27,32 @@ O gerenciamento de dependências e plugins para o próprio `build-logic` e suas 
 
 ## 🧩 Plugins de Conveniência (Convention Plugins)
 
-Eles centralizam a lógica, evitando a repetição exaustiva de configurações nos arquivos `build.gradle.kts` de cada módulo do projeto. Abaixo, a lista dos principais plugins registrados e suas finalidades:
+Os plugins de conveniência centralizam toda a lógica de build, eliminando a repetição em arquivos `build.gradle.kts`. Abaixo estão organizados por categoria e finalidade:
 
-*   **`convention.root` (`RootConventionPlugin`)**
-    Deve ser aplicado no `build.gradle.kts` principal da raiz do projeto. Ele aplica configurações gerais como o Spotless para arquivos `*.gradle.kts` e também registra e orquestra a agregação de relatórios de cobertura do JaCoco para todos os módulos.
-*   **`convention.android.application` (`AndroidApplicationConventionPlugin`)**
-    Configura os módulos finais executáveis do tipo "app". Ele aplica os padrões Android (SDK mínimo, alvo e compilação), assina as ferramentas de build (AGP) e integra as ferramentas de qualidade de código.
-*   **`convention.android.library` (`AndroidLibraryConventionPlugin`)**
-    Utilizado em módulos de biblioteca Android comuns (como `:module-core`).
-*   **`convention.android.feature` (`AndroidFeatureConventionPlugin`)**
-    Especialização de biblioteca para módulos de funcionalidades (features) do app (como `:module-feature`), frequentemente incluindo outras dependências utilitárias de UI.
-*   **`convention.android.compose` (`AndroidComposeConventionPlugin`)**
-    Aplica as dependências, as features de compilação e o plugin do compilador do Kotlin necessários para utilizar o Jetpack Compose em um módulo.
-*   **`convention.kotlin.jvm` (`KotlinJvmConventionPlugin`)**
-    Configura módulos 100% Kotlin (JVM), que não possuem nenhuma dependência das APIs do Android, ideal para regras de negócios puras ou utilitários (ex: `:module-jvm`).
-*   **`convention.hilt` (`HiltConventionPlugin`)**
-    Aplica o plugin de injeção de dependência Dagger/Hilt e o KSP (Kotlin Symbol Processing) para gerar os componentes necessários.
+### 🌐 1. Raiz & Infraestrutura
 
-> *Nota:* Há outros plugins internos (como `SpotlessConventionPlugin`, `DetektConventionPlugin`, `JacocoAndroidConventionPlugin`, etc.) que são aplicados automaticamente por trás dos panos nos plugins citados acima.
+| Plugin ID         | Classe de Implementação | Descrição                                                                                                                                   |
+|:------------------|:------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
+| `convention.root` | `RootConventionPlugin`  | Aplicado na raiz do projeto. Configura o Spotless para arquivos `*.gradle.kts` e gerencia a agregação de relatórios de cobertura do JaCoCo. |
+
+### 📱 2. Módulos Android
+
+| Plugin ID                        | Classe de Implementação              | Descrição                                                                                                                  |
+|:---------------------------------|:-------------------------------------|:---------------------------------------------------------------------------------------------------------------------------|
+| `convention.android.application` | `AndroidApplicationConventionPlugin` | Configura apps executáveis (`:app`), definindo SDKs, AGP e ferramentas de qualidade.                                       |
+| `convention.android.library`     | `AndroidLibraryConventionPlugin`     | Configura bibliotecas Android reutilizáveis comuns (ex: `:module-core`).                                                   |
+| `convention.android.feature`     | `AndroidFeatureConventionPlugin`     | Especializado para módulos de funcionalidade do app (ex: `:module-feature`), incluindo suporte a UI e dependências comuns. |
+| `convention.android.compose`     | `AndroidComposeConventionPlugin`     | Habilita o Jetpack Compose, opções do compilador e dependências de UI em módulos Android.                                  |
+
+### ⚙️ 3. Módulos JVM & Injeção de Dependência
+
+| Plugin ID               | Classe de Implementação     | Descrição                                                                          |
+|:------------------------|:----------------------------|:-----------------------------------------------------------------------------------|
+| `convention.kotlin.jvm` | `KotlinJvmConventionPlugin` | Configura módulos 100% Kotlin puros, sem dependências Android (ex: `:module-jvm`). |
+| `convention.hilt`       | `HiltConventionPlugin`      | Configura Dagger/Hilt e KSP para injeção de dependência.                           |
+
+> [!NOTE]
+> **Plugins Internos:** Há plugins auxiliares (como `SpotlessConventionPlugin`, `DetektConventionPlugin`, `JacocoAndroidConventionPlugin`, etc.) que são aplicados automaticamente em segundo plano pelos plugins de conveniência citados acima.
 
 ---
 
