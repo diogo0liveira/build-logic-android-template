@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
-internal class MainViewModel @Inject constructor(getGreeting: GetGreeting) : ViewModel() {
+internal class MainViewModel @Inject constructor(
+    getGreeting: GetGreeting,
+) : ViewModel() {
     val greeting: StateFlow<String>
         field: MutableStateFlow<String> = MutableStateFlow(getGreeting())
 }

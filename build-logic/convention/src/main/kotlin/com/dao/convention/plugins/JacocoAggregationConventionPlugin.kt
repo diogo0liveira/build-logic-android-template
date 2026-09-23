@@ -78,6 +78,6 @@ internal abstract class JacocoAggregationConventionPlugin @Inject constructor(
     private companion object {
         private const val JACOCO_REPORT_LINK_SERVICE = "jacocoReportLinkService"
         private const val JACOCO_AGGREGATION_EXTENSION = "jacocoAggregation"
-        private const val JACOCO_AGGREGATION_TASK = "jacocoAggregatedReport"
+        private const val JACOCO_AGGREGATION_TASK = "jacocoAggregateReport"
     }
 }
