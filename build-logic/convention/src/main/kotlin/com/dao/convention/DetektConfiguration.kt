@@ -14,7 +14,10 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 
-internal fun Project.configureDetekt(vararg sourceSets: Any, baselineDir: File = projectDir) {
+internal fun Project.configureDetekt(
+    vararg sourceSets: Any,
+    baselineDir: File = projectDir,
+) {
     pluginManager.apply(DetektPlugin::class)
 
     extensions.configure<DetektExtension> {

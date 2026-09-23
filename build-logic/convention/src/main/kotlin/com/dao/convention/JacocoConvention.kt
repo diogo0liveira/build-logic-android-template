@@ -54,7 +54,10 @@ internal fun Project.registerCoverageTask(
     }
 }
 
-private fun Project.linkServiceBuilder(taskName: String, report: File): Provider<CoverageReportLinkService> {
+private fun Project.linkServiceBuilder(
+    taskName: String,
+    report: File,
+): Provider<CoverageReportLinkService> {
     return gradle.sharedServices.registerIfAbsent(
         name = taskName,
         implementationType = CoverageReportLinkService::class,

@@ -30,6 +30,7 @@ private val JACOCO_EXCLUDE_PATTERNS = listOf(
     "**/databinding/*",
     "**/DataBinderMapperImpl*",
     // Compose
+    "**/theme/**",
     "**/ui/theme/**",
     $$"**/*$Lambda$*.*",
     $$"**/*$default*.*",

@@ -9,7 +9,10 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
-internal fun Project.configureSpotless(gradleTargets: String? = null, kotlinTargets: String? = null) {
+internal fun Project.configureSpotless(
+    gradleTargets: String? = null,
+    kotlinTargets: String? = null,
+) {
     pluginManager.apply(SpotlessPlugin::class)
 
     extensions.configure<SpotlessExtension> {
