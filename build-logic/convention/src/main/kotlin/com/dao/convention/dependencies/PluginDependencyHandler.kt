@@ -22,6 +22,9 @@ fun PluginManager.apply(notation: Provider<PluginDependency>) {
 /**
  * Executa uma ação quando um plugin específico, fornecido por um provedor de dependência, for aplicado.
  */
-fun PluginManager.withPlugin(notation: Provider<PluginDependency>, action: Action<in AppliedPlugin>) {
+fun PluginManager.withPlugin(
+    notation: Provider<PluginDependency>,
+    action: Action<in AppliedPlugin>,
+) {
     withPlugin(notation.id, action)
 }
