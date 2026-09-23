@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dao.android.module.core.annotations.IgnoreGeneratedPreview
 import com.dao.android.module.feature.Greeting
-import com.dao.android.template.ui.theme.CinematicTheme
+import com.dao.android.module.feature.theme.TemplateTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,7 +45,7 @@ internal class MainActivity : ComponentActivity() {
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun MainScreen(greeting: String) {
-    CinematicTheme {
+    TemplateTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
