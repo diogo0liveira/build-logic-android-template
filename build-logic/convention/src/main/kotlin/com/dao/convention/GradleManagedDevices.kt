@@ -45,7 +45,11 @@ private fun NamedDomainObjectContainer<ManagedVirtualDevice>.create(config: Devi
     }
 }
 
-private data class DeviceConfig(val device: String, val apiLevel: Int, val systemImageSource: String) {
+private data class DeviceConfig(
+    val device: String,
+    val apiLevel: Int,
+    val systemImageSource: String,
+) {
     val name = buildString {
         append(device.lowercase().replace(" ", ""))
         append("api")

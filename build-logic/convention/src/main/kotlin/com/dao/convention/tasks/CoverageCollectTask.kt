@@ -30,6 +30,7 @@ private val JACOCO_EXCLUDE_PATTERNS = listOf(
     "**/databinding/*",
     "**/DataBinderMapperImpl*",
     // Compose
+    "**/theme/**",
     "**/ui/theme/**",
     $$"**/*$Lambda$*.*",
     $$"**/*$default*.*",
@@ -72,8 +73,9 @@ private val JACOCO_EXCLUDE_PATTERNS = listOf(
 )
 
 @CacheableTask
-internal abstract class CoverageCollectTask @Inject constructor(private val fileSystem: FileSystemOperations) :
-    DefaultTask() {
+internal abstract class CoverageCollectTask @Inject constructor(
+    private val fileSystem: FileSystemOperations,
+) : DefaultTask() {
     @get:Optional
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)

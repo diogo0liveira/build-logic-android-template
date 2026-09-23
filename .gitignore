@@ -1,15 +1,50 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+output-metadata.json
+
+# Java/Kotlin class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+build/
+
+# Gradle / Kotlin
+.gradle/
+.kotlin/
 local.properties
+
+# Android Studio generated / NDK
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Logs / profiling
+*.log
+*.hprof
+
+# Signing (never commit — see AGENTS.md §7)
+*.jks
+*.keystore
+
+# Android Studio / IntelliJ
+# Whitelist: ignore everything in .idea except shareable project settings
+*.iml
+*.iws
+.idea/*
+!.idea/codeStyles/
+!.idea/copyright/
+!.idea/dictionaries/
+!.idea/inspectionProfiles/
+!.idea/runConfigurations/
+!.idea/vcs.xml
+
+# OS generated files
+.DS_Store
+Thumbs.db
