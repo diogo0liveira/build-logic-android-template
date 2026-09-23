@@ -1,4 +1,4 @@
-package com.dao.android.template.ui.theme
+package com.dao.android.module.feature.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -25,7 +25,7 @@ private val LightColorScheme =
     )
 
 @Composable
-internal fun CinematicTheme(
+public fun TemplateTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
