@@ -3,6 +3,7 @@ package com.dao.convention.plugins
 import com.dao.convention.BUILD_LOGIC
 import com.dao.convention.configureSpotless
 import com.dao.convention.extensions.JacocoAggregationExtension
+import com.dao.convention.extensions.JacocoVerificationExtension
 import com.dao.convention.requireIsRoot
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -14,12 +15,19 @@ internal abstract class RootConventionPlugin : Plugin<Project> {
         project.requireIsRoot()
 
         with(project) {
+            pluginManager.apply(JacocoVerificationConventionPlugin::class)
             pluginManager.apply(JacocoAggregationConventionPlugin::class)
 
             configureSpotless(
                 gradleTargets = "$BUILD_LOGIC/**/*.gradle.kts",
                 kotlinTargets = "$BUILD_LOGIC/**/*.kt",
             )
+
+            extensions.configure<JacocoVerificationExtension> {
+                minInstructionCoverage.convention(0.90.toBigDecimal())
+                minBranchCoverage.convention(0.80.toBigDecimal())
+                haltOnFailure.convention(true)
+            }
 
             extensions.configure<JacocoAggregationExtension> {
                 modules.addAll(
