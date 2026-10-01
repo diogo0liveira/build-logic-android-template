@@ -6,13 +6,27 @@ import com.android.build.api.variant.Variant
 import com.dao.convention.services.CoverageReportLinkService
 import com.dao.convention.tasks.CoverageCollectTask
 import com.dao.convention.tasks.CoverageReportTask
-import java.io.File
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registerIfAbsent
+import org.gradle.testing.jacoco.tasks.JacocoReportsContainer
+
+internal fun Task.linkServiceBuilder(reports: JacocoReportsContainer): Provider<CoverageReportLinkService> {
+    return (if (project.isRoot) ":$name" else path).let { name ->
+        project.gradle.sharedServices.registerIfAbsent(
+            name = "${name}LinkService",
+            implementationType = CoverageReportLinkService::class,
+        ) {
+            parameters.reportCsv.set(reports.csv.outputLocation.get())
+            parameters.reportHtml.set(reports.html.entryPoint)
+            parameters.task.set(name)
+        }
+    }
+}
 
 internal fun Project.registerCoverageTask(
     variant: Variant,
@@ -48,21 +62,8 @@ internal fun Project.registerCoverageTask(
             group = COVERAGE_TASK_GROUP
             description = "Gera o relatório de cobertura de testes para: ${variant.name}."
             coverageFiles.from(collect.flatMap(CoverageCollectTask::outputDir))
-            registry.onTaskCompletion(linkServiceBuilder(name, reports.html.entryPoint))
+            registry.onTaskCompletion(linkServiceBuilder(reports))
             dependsOn(collect)
         }
-    }
-}
-
-private fun Project.linkServiceBuilder(
-    taskName: String,
-    report: File,
-): Provider<CoverageReportLinkService> {
-    return gradle.sharedServices.registerIfAbsent(
-        name = taskName,
-        implementationType = CoverageReportLinkService::class,
-    ) {
-        parameters.task.set("$path:$taskName")
-        parameters.reportHtml.set(report)
     }
 }

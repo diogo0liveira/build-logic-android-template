@@ -14,19 +14,17 @@ internal abstract class CoverageReportTask : JacocoReport() {
     abstract val coverageFiles: ConfigurableFileCollection
 
     init {
+        reports.csv.required.set(true)
         reports.html.required.set(true)
         reports.xml.required.set(false)
-        reports.csv.required.set(false)
 
+        reports.csv.outputLocation.convention(
+            project.layout.buildDirectory.file("reports/jacoco/$name/$name.csv"),
+        )
         reports.html.outputLocation.convention(
             project.layout.buildDirectory.dir("reports/jacoco/$name/html"),
         )
 
-        executionData.from(
-            coverageFiles.asFileTree.matching {
-                include("**/*.exec", "**/*.ec")
-            },
-        )
         classDirectories.from(
             coverageFiles.elements.map { list ->
                 list.map { it.asFile.resolve("classes") }
@@ -35,6 +33,11 @@ internal abstract class CoverageReportTask : JacocoReport() {
         sourceDirectories.from(
             coverageFiles.elements.map { list ->
                 list.map { it.asFile.resolve("sources") }
+            },
+        )
+        executionData.from(
+            coverageFiles.asFileTree.matching {
+                include("**/*.exec", "**/*.ec")
             },
         )
     }

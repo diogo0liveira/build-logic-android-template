@@ -15,6 +15,7 @@ internal abstract class CoverageReportLinkService :
     OperationCompletionListener {
     interface Parameters : BuildServiceParameters {
         val task: Property<String>
+        val reportCsv: RegularFileProperty
         val reportHtml: RegularFileProperty
     }
 
@@ -26,6 +27,21 @@ internal abstract class CoverageReportLinkService :
                 if (report.exists()) {
                     println("\n📊  Relatório de Cobertura JaCoCo")
                     println("👉  ${report.toURI()}\n")
+                }
+            }
+
+            if (parameters.reportCsv.isPresent) {
+                val csvFile = parameters.reportCsv.asFile.get()
+
+                if (csvFile.exists()) {
+                    val summary = JacocoReportSummary.parse(
+                        headerTitle = "JaCoCo Coverage Report (${parameters.task.get()})",
+                        csvFile = csvFile,
+                    )
+
+                    if (summary != null) {
+                        println("\n" + JacocoConsoleFormatter.format(summary))
+                    }
                 }
             }
         }

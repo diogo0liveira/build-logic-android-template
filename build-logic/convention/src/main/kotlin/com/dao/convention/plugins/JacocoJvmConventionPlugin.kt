@@ -6,12 +6,15 @@ import com.dao.convention.createJacocoConsumableConfiguration
 import com.dao.convention.dependencies.id
 import com.dao.convention.dependencies.libs
 import com.dao.convention.dependencies.version
+import com.dao.convention.linkServiceBuilder
 import com.dao.convention.tasks.CoverageCollectTask
 import com.dao.convention.tasks.CoverageReportTask
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.testing.Test
+import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
@@ -21,7 +24,9 @@ import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 
-internal abstract class JacocoJvmConventionPlugin : Plugin<Project> {
+internal abstract class JacocoJvmConventionPlugin @Inject constructor(
+    private val registry: BuildEventsListenerRegistry,
+) : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
             pluginManager.apply(JacocoPlugin::class)
@@ -53,6 +58,7 @@ internal abstract class JacocoJvmConventionPlugin : Plugin<Project> {
                     description = "Gera e exibe o relatório de cobertura de testes do módulo JVM."
                     dependsOn(collectTask)
                     coverageFiles.from(collectTask.flatMap(CoverageCollectTask::outputDir))
+                    registry.onTaskCompletion(linkServiceBuilder(reports))
                 }
 
                 configuration.configure {

@@ -14,6 +14,7 @@ internal abstract class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
             pluginManager.apply(libs.plugins.android.application)
+            pluginManager.apply(JacocoVerificationConventionPlugin::class)
             pluginManager.apply(JacocoAndroidConventionPlugin::class)
             pluginManager.apply(SpotlessConventionPlugin::class)
             pluginManager.apply(DetektConventionPlugin::class)

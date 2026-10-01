@@ -52,7 +52,7 @@ Os plugins de conveniência centralizam toda a lógica de build, eliminando a re
 | `convention.hilt`       | `HiltConventionPlugin`      | Configura Dagger/Hilt e KSP para injeção de dependência.                           |
 
 > [!NOTE]
-> **Plugins Internos:** Há plugins auxiliares (como `SpotlessConventionPlugin`, `DetektConventionPlugin`, `JacocoAndroidConventionPlugin`, etc.) que são aplicados automaticamente em segundo plano pelos plugins de conveniência citados acima.
+> **Plugins Internos:** Há plugins auxiliares (como `SpotlessConventionPlugin`, `DetektConventionPlugin`, `JacocoAndroidConventionPlugin`, `JacocoVerificationConventionPlugin`, etc.) que são aplicados automaticamente em segundo plano pelos plugins de conveniência citados acima.
 
 ---
 
@@ -63,16 +63,16 @@ O projeto possui suporte integrado para gerar relatórios de cobertura de testes
 Para gerar o relatório agregado, basta rodar o comando abaixo na raiz do projeto:
 
 ```bash
-./gradlew jacocoAggregatedReport
+./gradlew jacocoAggregateReport
 ```
 
 ### Outras Tarefas de Cobertura Relevantes
 Além do relatório agregado na raiz, os plugins de conveniência também disponibilizam tarefas granulares diretamente em cada módulo:
 
 *   **Para Módulos Android (Exclusivo para a variante `debug`):**
-    *   `debugUnitTestCoverage` (ex: `./gradlew :app:debugUnitTestCoverage`): Relatório apenas dos testes de unidade.
-    *   `debugAndroidTestCoverage` (ex: `./gradlew :app:debugAndroidTestCoverage`): Relatório apenas dos testes instrumentados.
-    *   `debugAggregateCoverage` (ex: `./gradlew :app:debugAggregateCoverage`): Relatório agregado (unidade + instrumentados) específico daquele módulo.
+    *   `reportDebugUnitTestCoverage` (ex: `./gradlew :app:reportDebugUnitTestCoverage`): Relatório apenas dos testes de unidade.
+    *   `reportDebugAndroidTestCoverage` (ex: `./gradlew :app:reportDebugAndroidTestCoverage`): Relatório apenas dos testes instrumentados.
+    *   `reportDebugAggregateCoverage` (ex: `./gradlew :app:reportDebugAggregateCoverage`): Relatório agregado (unidade + instrumentados) específico daquele módulo.
 *   **Para Módulos JVM puros:**
     *   `reportJvmCoverage` (ex: `./gradlew :module-jvm:reportJvmCoverage`): Relatório de cobertura específico do módulo JVM.
 
@@ -95,6 +95,23 @@ jacocoAggregation {
 ```
 
 O plugin raiz também cria um serviço (`CoverageReportLinkService`) que imprime automaticamente um link para o arquivo HTML no seu terminal (console) quando a task finaliza com sucesso.
+
+### Verificação de Cobertura
+O projeto também inclui suporte para verificar se a cobertura de testes atinge as metas mínimas estipuladas.
+Isso é feito através da tarefa `jacocoCoverageVerification`, que é acoplada automaticamente à tarefa padrão `check` (ex: `./gradlew check`).
+
+**Onde configurar as metas de cobertura:**
+Você pode configurar os limites de cobertura no `build.gradle.kts` usando a extensão `jacocoVerification`. Exemplo:
+
+```kotlin
+jacocoVerification {
+    minInstructionCoverage = 0.80.toBigDecimal() // 80% de cobertura de instruções
+    minBranchCoverage = 0.70.toBigDecimal() // 70% de cobertura de ramificações
+    minLineCoverage = 0.85.toBigDecimal() // 85% de cobertura de linhas
+    haltOnFailure = true // Falha o build se as metas não forem atingidas
+}
+```
+Por padrão, todos os limites são configurados como `0` (desabilitado) e `haltOnFailure` é `false`.
 
 ---
 
