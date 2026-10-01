@@ -13,6 +13,10 @@ val Project.isRoot: Boolean
     //  get() = (this == rootProject)
     get() = (path == Project.PATH_SEPARATOR)
 
+val Project.isCoverage: Boolean
+    get() = providers.gradleProperty("coverage")
+        .getOrElse("false").toBoolean()
+
 fun Project.requireIsRoot() {
     require(isRoot) { "Project is not root!" }
 }

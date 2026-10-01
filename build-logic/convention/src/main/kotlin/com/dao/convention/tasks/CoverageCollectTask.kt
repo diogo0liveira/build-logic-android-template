@@ -1,5 +1,10 @@
 package com.dao.convention.tasks
 
+import com.dao.convention.COVERAGE_DIR_CLASSES
+import com.dao.convention.COVERAGE_DIR_EXEC_ANDROID
+import com.dao.convention.COVERAGE_DIR_EXEC_UNIT
+import com.dao.convention.COVERAGE_DIR_SOURCES
+import com.dao.convention.addReportFallbackIfNecessary
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ArchiveOperations
@@ -17,67 +22,12 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-private val JACOCO_EXCLUDE_PATTERNS = listOf(
-    "**/R.class",
-    "**/R$*.class",
-    "**/Manifest*.*",
-    "**/BuildConfig.*",
-    $$"**/*$ViewBinder*.*",
-    $$"**/*$ViewInjector*.*",
-    "android/**/*.*",
-    // Data Binding
-    "**/*Binding.*",
-    "**/*BindingImpl.*",
-    "**/databinding/*",
-    "**/DataBinderMapperImpl*",
-    // Compose
-    "**/theme/**",
-    "**/ui/theme/**",
-    $$"**/*$Lambda$*.*",
-    $$"**/*$default*.*",
-    "**/*Preview*.*",
-    "**/*PreviewKt.class",
-    "**/ComposableSingletons$*",
-    "**/*ComposableSingletons*.*",
-    // Navigation
-    "**/*Args*.*",
-    "**/*NavGraph*.*",
-    "**/*Directions*.*",
-    "**/*Destinations*.*",
-    $$"**/*Screen$Companion*.*",
-    // Kotlin
-    $$"**/*$WhenMappings.*",
-    "**/*Kt$*.class", // top-level funções lambda internas
-    "**/*JsonAdapter.*", // Moshi
-    "**/*_Impl.*", // Room DAOs/Database
-    $$"**/*$serializer.*", // kotlinx.serialization
-    "**/*JsonAdapter.*", // Moshi generated adapters
-    // Hilt/Dagger
-    "dagger/**",
-    "**/*_Factory*",
-    "**/*_GeneratedInjector*",
-    "**/*_ComponentTreeDeps*",
-    "**/*_MembersInjector*",
-    "**/*_Provide*Factory*",
-    "**/*_Factory.*",
-    "**/*Module_*Factory.*",
-    "**/*_MembersInjector.*",
-    "**/Dagger*Component*.*",
-    "**/*_HiltModules*.*",
-    "**/*_HiltComponents*.*",
-    "hilt_aggregated_deps/**",
-    "**/hilt_aggregated_deps/**",
-    "**/*_HiltModules*",
-    "**/HiltWrapper_*",
-    "**/*_Hilt*",
-    "**/Hilt_*",
-)
-
 @CacheableTask
 internal abstract class CoverageCollectTask @Inject constructor(
     private val archiveOperations: ArchiveOperations,
     private val fileSystem: FileSystemOperations,
-) : DefaultTask() {
+) : DefaultTask(), JacocoClassesArtifactAware {
+
     @get:Optional
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -91,12 +41,12 @@ internal abstract class CoverageCollectTask @Inject constructor(
     @get:Optional
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val classJars: ListProperty<RegularFile>
+    abstract override val scopedClassJars: ListProperty<RegularFile>
 
     @get:Optional
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val classDirectories: ListProperty<Directory>
+    abstract override val scopedClassDirectories: ListProperty<Directory>
 
     @get:Optional
     @get:InputFiles
@@ -119,46 +69,49 @@ internal abstract class CoverageCollectTask @Inject constructor(
         if (!unitTestExecutionData.isEmpty) {
             fileSystem.copy {
                 from(unitTestExecutionData)
-                into(outputDir.dir("exec/unit"))
+                into(outputDir.dir(COVERAGE_DIR_EXEC_UNIT))
                     .include("**/*.exec")
             }
         }
         if (!androidTestExecutionData.isEmpty) {
             fileSystem.copy {
                 from(androidTestExecutionData)
-                into(outputDir.dir("exec/android"))
+                into(outputDir.dir(COVERAGE_DIR_EXEC_ANDROID))
                     .include("**/*.ec")
             }
         }
-        if (classDirectories.isPresent) {
+        if (scopedClassDirectories.isPresent) {
             fileSystem.copy {
-                from(classDirectories)
-                into(outputDir.dir("classes"))
+                from(scopedClassDirectories)
+                into(outputDir.dir(COVERAGE_DIR_CLASSES))
                     .exclude(JACOCO_EXCLUDE_PATTERNS)
             }
         }
-        if (classJars.isPresent && classJars.get().isNotEmpty()) {
-            classJars.get().forEach { jar ->
+        if (scopedClassJars.isPresent && scopedClassJars.get().isNotEmpty()) {
+            scopedClassJars.get().forEach { jar ->
                 fileSystem.copy {
                     from(archiveOperations.zipTree(jar))
-                    into(outputDir.dir("classes"))
+                    into(outputDir.dir(COVERAGE_DIR_CLASSES))
                     exclude(JACOCO_EXCLUDE_PATTERNS)
                 }
             }
         }
+
         if (!classFiles.isEmpty) {
             fileSystem.copy {
                 from(classFiles)
-                into(outputDir.dir("classes"))
+                into(outputDir.dir(COVERAGE_DIR_CLASSES))
                     .exclude(JACOCO_EXCLUDE_PATTERNS)
             }
         }
         if (!sourceDirectories.isEmpty) {
             fileSystem.copy {
                 from(sourceDirectories)
-                into(outputDir.dir("sources"))
+                into(outputDir.dir(COVERAGE_DIR_SOURCES))
                     .exclude(JACOCO_EXCLUDE_PATTERNS)
             }
         }
+
+        outputDir.addReportFallbackIfNecessary()
     }
 }

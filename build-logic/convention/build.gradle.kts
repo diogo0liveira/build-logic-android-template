@@ -25,6 +25,10 @@ dependencies {
     compileOnly(libs.detekt.gradle.plugin)
     compileOnly(libs.spotless.gradle.plugin)
     lintChecks(libs.android.gradle.lint)
+
+    testImplementation(libs.test.junit)
+    testImplementation(libs.test.kotlin)
+    testImplementation(libs.test.mockk)
 }
 
 gradlePlugin {

@@ -2,14 +2,15 @@ package com.dao.convention.plugins
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
-import com.dao.convention.COVERAGE_OUTPUT
 import com.dao.convention.GMD_GROUP_NAME
 import com.dao.convention.createJacocoConsumableConfiguration
 import com.dao.convention.dependencies.id
 import com.dao.convention.dependencies.libs
 import com.dao.convention.dependencies.version
+import com.dao.convention.extensions.createJacocoVerificationExtension
+import com.dao.convention.isCoverage
 import com.dao.convention.registerCoverageTask
-import com.dao.convention.tasks.CoverageCollectTask
+import com.dao.convention.tasks.register.registerCoverageTask
 import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -18,7 +19,6 @@ import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
@@ -36,8 +36,9 @@ internal abstract class JacocoAndroidConventionPlugin @Inject constructor(
                     toolVersion = libs.versions.jacoco.version
                 }
 
-                val enableCoverage = providers.gradleProperty("coverage")
-                    .getOrElse("false").toBoolean()
+                val configuration = createJacocoConsumableConfiguration()
+                val verification = createJacocoVerificationExtension()
+                val enableCoverage = isCoverage
 
                 extensions.configure<CommonExtension> {
                     buildTypes.named(COVERAGE_BUILD_TYPE) {
@@ -48,59 +49,14 @@ internal abstract class JacocoAndroidConventionPlugin @Inject constructor(
 
                 with(extensions.getByType(AndroidComponentsExtension::class)) {
                     val variantSelector = selector().withBuildType(COVERAGE_BUILD_TYPE)
-                    val configuration = createJacocoConsumableConfiguration()
 
                     onVariants(variantSelector) { variant ->
-                        val type = variant.name.uppercaseFirstChar()
-
                         registerCoverageTask(
                             variant = variant,
                             registry = registry,
-                            taskName = "${type}UnitTestCoverage",
-                            taskDependsOn = setOf("test${type}UnitTest"),
-                            outputTaskDir = "$COVERAGE_OUTPUT${variant.name}/unit",
-                        ) {
-                            unitTestExecutionData.from(
-                                layout.buildDirectory
-                                    .files("$OUTPUT_UNIT_TEST${variant.name}UnitTest"),
-                            )
-                        }
-
-                        registerCoverageTask(
-                            variant = variant,
-                            registry = registry,
-                            taskName = "${type}AndroidTestCoverage",
-                            taskDependsOn = setOf("$GMD_GROUP${type}AndroidTest"),
-                            outputTaskDir = "$COVERAGE_OUTPUT${variant.name}/android",
-                        ) {
-                            androidTestExecutionData.from(
-                                layout.buildDirectory
-                                    .files("$OUTPUT_INST_TEST${variant.name}AndroidTest"),
-                            )
-                        }
-
-                        registerCoverageTask(
-                            variant = variant,
-                            registry = registry,
-                            taskName = "${type}AggregateCoverage",
-                            taskDependsOn = setOf("test${type}UnitTest", "$GMD_GROUP${type}AndroidTest"),
-                            outputTaskDir = "$COVERAGE_OUTPUT${variant.name}/Aggregate",
-                        ) {
-                            unitTestExecutionData.from(
-                                layout.buildDirectory
-                                    .files("$OUTPUT_UNIT_TEST${variant.name}UnitTest"),
-                            )
-                            androidTestExecutionData.from(
-                                layout.buildDirectory
-                                    .files("$OUTPUT_INST_TEST${variant.name}"),
-                            )
-                        }.also { collectTask ->
-                            configuration.configure {
-                                outgoing.artifact(
-                                    collectTask.flatMap(CoverageCollectTask::outputDir),
-                                )
-                            }
-                        }
+                            verification = verification,
+                            configuration = configuration,
+                        )
                     }
                 }
 
@@ -116,8 +72,5 @@ internal abstract class JacocoAndroidConventionPlugin @Inject constructor(
 
     private companion object {
         private const val COVERAGE_BUILD_TYPE = "debug"
-        private const val GMD_GROUP = "${GMD_GROUP_NAME}Group"
-        private const val OUTPUT_INST_TEST = "outputs/managed_device_code_coverage/"
-        private const val OUTPUT_UNIT_TEST = "outputs/unit_test_code_coverage/"
     }
 }
