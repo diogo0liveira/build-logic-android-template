@@ -58,29 +58,54 @@ Os plugins de conveniência centralizam toda a lógica de build, eliminando a re
 
 ## 📊 Relatório de Cobertura (JaCoco)
 
-O projeto possui suporte integrado para gerar relatórios de cobertura de testes combinando a execução de testes em múltiplos módulos.
+O projeto possui suporte integrado para gerar relatórios de cobertura de testes combinando a execução de múltiplos módulos e verificando metas mínimas de cobertura. Todas as tarefas públicas pertencem ao grupo **"Coverage Report Convention"**.
 
-Para gerar o relatório agregado, basta rodar o comando abaixo na raiz do projeto:
+Para gerar o relatório agregado do projeto e verificar a cobertura, rode o comando abaixo na raiz:
 
 ```bash
-./gradlew jacocoAggregatedReport
+./gradlew coverageTestReport -Pcoverage=true
 ```
 
+> [!NOTE]
+> O parâmetro `-Pcoverage=true` é necessário para habilitar a instrumentação e extração de métricas de cobertura nos módulos Android.
+
 ### Outras Tarefas de Cobertura Relevantes
-Além do relatório agregado na raiz, os plugins de conveniência também disponibilizam tarefas granulares diretamente em cada módulo:
+Além do relatório global na raiz, tarefas granulares estão disponíveis diretamente em cada módulo. As tarefas locais conectam-se diretamente às saídas de compilação e teste (via `SourceSet` e `ScopedArtifact.CLASSES`), sem necessidade de duplicação física em disco:
 
-*   **Para Módulos Android (Exclusivo para a variante `debug`):**
-    *   `debugUnitTestCoverage` (ex: `./gradlew :app:debugUnitTestCoverage`): Relatório apenas dos testes de unidade.
-    *   `debugAndroidTestCoverage` (ex: `./gradlew :app:debugAndroidTestCoverage`): Relatório apenas dos testes instrumentados.
-    *   `debugAggregateCoverage` (ex: `./gradlew :app:debugAggregateCoverage`): Relatório agregado (unidade + instrumentados) específico daquele módulo.
+*   **Para Módulos Android:**
+    *   Relatório apenas dos testes de unidade:
+        *   `coverageUnitTestReport` (ex: `./gradlew :app:coverageUnitTestReport -Pcoverage=true`)
+    *   Relatório apenas dos testes instrumentados (GMD):
+        *   `coverageAndroidTestReport` (ex: `./gradlew :app:coverageAndroidTestReport -Pcoverage=true`)
+    *   Relatório agregado e verificação (unidade + instrumentados) específico do módulo:
+        *   `coverageTestReport` (ex: `./gradlew :app:coverageTestReport -Pcoverage=true`)
 *   **Para Módulos JVM puros:**
-    *   `reportJvmCoverage` (ex: `./gradlew :module-jvm:reportJvmCoverage`): Relatório de cobertura específico do módulo JVM.
+    *   Relatório e verificação específico do módulo JVM:
+        *   `coverageTestReport` (ex: `./gradlew :module-jvm:coverageTestReport`)
 
-### Como funciona
-A agregação é feita por meio do plugin **`JacocoAggregationConventionPlugin`**, que é aplicado pelo plugin root. Esse plugin varre todos os módulos registrados e agrega seus arquivos de execução (arquivos `.exec` e `.ec`) em um único relatório HTML que exibe a cobertura geral do projeto.
+> [!NOTE]
+> A tarefa de coleta física (`collect*Coverage`) é acionada sob demanda apenas na agregação global da raiz (`:coverageTestReport`), necessária para compartilhar artefatos entre múltiplos módulos.
 
-**Onde configurar os módulos incluídos:**
-Os módulos que devem fazer parte do relatório final são configurados diretamente no `build.gradle.kts` da raiz, usando a extensão `jacocoAggregation`. Exemplo:
+Ao finalizar, as tarefas exibem no terminal uma tabela hierárquica por pacote/classe com status colorido e o link direto para o relatório HTML interativo:
+
+```text
+=============================================================================================
+📊 JaCoCo Coverage Report (:coverageTestReport)
+=============================================================================================
+Package/Class                                         Line (%)   Branch (%)   Instruction (%)
+---------------------------------------------------------------------------------------------
+com.dao.android.module.core                              80.0%        75.0%             90.0%
+  ├── GetGreeting                                       100.0%          n/a            100.0%
+  └── SetGreeting                                        66.7%          n/a             83.3%
+---------------------------------------------------------------------------------------------
+Total                                            80.0% (8/10) 75.0% (15/20)    90.0% (90/100)
+=============================================================================================
+👉 Relatório HTML: file:///.../build/reports/jacoco/reportTestCoverage/html/index.html
+=============================================================================================
+```
+
+### Módulos Incluídos na Agregação Global
+Para a tarefa agregada raiz (`coverageTestReport`), os módulos incluídos por padrão pelo plugin `convention.root` são `:app`, `:module-feature`, `:module-core` e `:module-jvm`. Você pode customizar os módulos diretamente no `build.gradle.kts` da raiz através da extensão `jacocoAggregation`:
 
 ```kotlin
 // Em build.gradle.kts (root)
@@ -94,7 +119,30 @@ jacocoAggregation {
 }
 ```
 
-O plugin raiz também cria um serviço (`CoverageReportLinkService`) que imprime automaticamente um link para o arquivo HTML no seu terminal (console) quando a task finaliza com sucesso.
+### Verificação de Metas de Cobertura
+A verificação estrita de limites de cobertura (`verify*Coverage`) é executada no fluxo da tarefa combinada `coverageTestReport` (tanto nos módulos locais quanto no root com `-Pcoverage`), garantindo que o ciclo padrão de compilação e checagem (`./gradlew check` e `./gradlew build`) permaneça desacoplado e rápido quando o relatório de cobertura não estiver em execução.
+
+Por padrão, a convenção raiz estabelece as seguintes metas globais:
+* **Cobertura de instruções (bytecode):** 90% (`minInstructionCoverage = 0.90`)
+* **Cobertura de ramificações (branches):** 80% (`minBranchCoverage = 0.80`)
+* **Cobertura de linhas:** 70% (`minLineCoverage = 0.70`) *(na extensão base o padrão é 0 / desabilitado)*
+* **Tolerância de aviso (amarelo):** 15% (`warningTolerance = 0.15`) *(alerta quando a cobertura fica até 15% abaixo da meta antes de falhar)*
+* **Falha no build:** Ativada por padrão (`haltOnFailure = true`)
+
+**Sobrescrevendo as metas:**
+Caso um módulo específico precise de regras diferentes das citadas acima, configure a extensão `jacocoVerification` **explicitamente no `build.gradle.kts` daquele módulo**.
+
+A configuração colocada no `build.gradle.kts` da **raiz** afeta **apenas** a verificação agregada global (`coverageTestReport`), não atuando em cascata sobre os submódulos:
+
+```kotlin
+jacocoVerification {
+    minInstructionCoverage.set(0.80.toBigDecimal()) // Exige 80% de instruções
+    minBranchCoverage.set(0.70.toBigDecimal())      // Exige 70% de branches
+    minLineCoverage.set(0.85.toBigDecimal())        // Exige 85% de linhas
+    warningTolerance.set(0.10.toBigDecimal())       // Tolerância de 10% para alerta
+    haltOnFailure.set(false)                        // Não falha o build em caso de violação
+}
+``````
 
 ---
 

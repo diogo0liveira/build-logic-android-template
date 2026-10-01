@@ -50,10 +50,14 @@ internal fun Project.createJacocoConsumableConfiguration(): NamedDomainObjectPro
  * para solicitar os dados expostos pelas Consumable Configurations.
  */
 internal fun Project.createJacocoResolvableConfiguration(): NamedDomainObjectProvider<Configuration> {
-    return configurations.register(JACOCO_RESOLVABLE_CONFIGURATION_NAME) {
-        configureAttributes(this)
-        isCanBeConsumed = false
-        isCanBeResolved = true
+    return if (configurations.names.contains(JACOCO_RESOLVABLE_CONFIGURATION_NAME)) {
+        configurations.named(JACOCO_RESOLVABLE_CONFIGURATION_NAME)
+    } else {
+        configurations.register(JACOCO_RESOLVABLE_CONFIGURATION_NAME) {
+            configureAttributes(this)
+            isCanBeConsumed = false
+            isCanBeResolved = true
+        }
     }
 }
 

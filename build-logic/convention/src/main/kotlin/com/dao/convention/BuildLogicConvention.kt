@@ -14,3 +14,7 @@ internal val JVM_SOURCE_SETS = arrayOf(SRC_MAIN_DIR, SRC_TEST_DIR)
 /* JaCoco */
 internal const val COVERAGE_TASK_GROUP = "Coverage Report Convention"
 internal const val COVERAGE_OUTPUT = "coverage_aggregation/"
+internal const val COVERAGE_DIR_CLASSES = "classes"
+internal const val COVERAGE_DIR_SOURCES = "sources"
+internal const val COVERAGE_DIR_EXEC_UNIT = "exec/unit"
+internal const val COVERAGE_DIR_EXEC_ANDROID = "exec/android"

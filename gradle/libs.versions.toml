@@ -25,6 +25,7 @@ test-android = "1.7.0"
 test-android-junit = "1.3.0"
 test-espresso = "3.7.0"
 test-junit = "4.13.2"
+test-mockk = "1.14.7"
 test-robolectric = "4.17"
 
 [plugins]
@@ -79,6 +80,7 @@ test-compose-ui-manifest = { group = "androidx.compose.ui", name = "ui-test-mani
 test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "test-espresso" }
 test-junit = { group = "junit", name = "junit", version.ref = "test-junit" }
 test-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+test-mockk = { group = "io.mockk", name = "mockk", version.ref = "test-mockk" }
 test-robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "test-robolectric" }
 
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle-api", version.ref = "agp" }
