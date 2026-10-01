@@ -9,6 +9,9 @@ max_line_length = 120
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.xml]
+ij_xml_keep_blank_lines = 1
+
 [.editorconfig]
 ij_editorconfig_space_after_comma = true
 ij_editorconfig_space_after_colon = false
