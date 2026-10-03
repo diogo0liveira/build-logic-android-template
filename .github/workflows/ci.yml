@@ -50,45 +50,52 @@ jobs:
         run: ./gradlew spotlessCheck
 
       - name: Run Static Code Analysis (Detekt)
+        id: detekt
         run: ./gradlew detekt
 
-      - name: Run Tests & Generate Coverage Report
-        run: ./gradlew jacocoAggregateReport -Pcoverage=true
-
-      - name: Upload JaCoCo Coverage Reports
-        if: always()
-        uses: actions/upload-artifact@v7.0.1
-        with:
-          name: jacoco-coverage-reports
-          path: '**/build/reports/jacoco/**'
-          retention-days: 7
-
-      - name: Verify Code Coverage Thresholds
-        run: ./gradlew jacocoCoverageVerification -Pcoverage=true
-
-      - name: Build Project & Lint
-        run: ./gradlew build -Pcoverage=true
-
-      - name: Upload Test Reports
-        if: failure()
-        uses: actions/upload-artifact@v7.0.1
-        with:
-          name: test-reports
-          path: '**/build/reports/tests/**'
-          retention-days: 7
-
       - name: Upload Detekt Reports
-        if: failure()
+        if: failure() && steps.detekt.outcome == 'failure'
         uses: actions/upload-artifact@v7.0.1
         with:
           name: detekt-reports
           path: '**/build/reports/detekt/**'
           retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Run Tests & Generate Coverage Report
+        id: test
+        run: ./gradlew jacocoAggregateReport -Pcoverage=true
+
+      - name: Upload Test Reports
+        if: failure() && steps.test.outcome == 'failure'
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: test-reports
+          path: '**/build/reports/tests/**'
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload JaCoCo Coverage Reports
+        if: always() && steps.test.outcome != 'skipped'
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: jacoco-coverage-reports
+          path: '**/build/reports/jacoco/**'
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Verify Code Coverage Thresholds
+        run: ./gradlew jacocoCoverageVerification -Pcoverage=true
+
+      - name: Build Project & Lint
+        id: build
+        run: ./gradlew build -Pcoverage=true
 
       - name: Upload Lint Reports
-        if: failure()
+        if: failure() && steps.build.outcome == 'failure'
         uses: actions/upload-artifact@v7.0.1
         with:
           name: lint-reports
           path: '**/build/reports/lint-results*'
           retention-days: 7
+          if-no-files-found: ignore
