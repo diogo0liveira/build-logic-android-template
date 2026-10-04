@@ -72,3 +72,8 @@ gradlePlugin {
         }
     }
 }
+
+dependencies {
+    testImplementation(libs.test.junit)
+    testImplementation(libs.test.kotlin)
+}
