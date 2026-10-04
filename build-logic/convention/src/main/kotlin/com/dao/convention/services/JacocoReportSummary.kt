@@ -32,35 +32,41 @@ internal object JacocoReportSummary {
     ): JacocoReportSummary? {
         if (!csvFile.isFile || csvFile.length() == 0L) return null
 
-        val lines = csvFile.extractLines()
-        val header = lines.extractHeader()
+        return csvFile.useLines { sequence ->
+            val iterator = sequence.filter(String::isNotBlank).iterator()
+            if (!iterator.hasNext()) return@useLines null
 
-        fun List<String>.counter(
-            missedCol: String,
-            coveredCol: String,
-        ) = CoverageCounter(
-            missed = getValue(missedCol, header),
-            covered = getValue(coveredCol, header),
-        )
+            val headerLine = iterator.next()
+            val header = headerLine.split(',').withIndex()
+                .associate { (index, name) -> name.trim() to index }
 
-        val packages = lines.asSequence().drop(1)
-            .map { line ->
-                val columns = line.split(',')
-                columns[header.getValue(PACKAGE)] to ClassCoverage(
-                    name = columns[header.getValue(CLASS)],
-                    line = columns.counter(LINE_MISSED, LINE_COVERED),
-                    branch = columns.counter(BRANCH_MISSED, BRANCH_COVERED),
-                    instruction = columns.counter(INSTRUCTION_MISSED, INSTRUCTION_COVERED),
-                )
-            }
-            .groupBy({ it.first }, { it.second })
-            .map { (name, classes) -> PackageCoverage(name, classes.sortedBy(ClassCoverage::name)) }
-            .sortedBy(PackageCoverage::name).toList()
+            fun List<String>.counter(
+                missedCol: String,
+                coveredCol: String,
+            ) = CoverageCounter(
+                missed = getValue(missedCol, header),
+                covered = getValue(coveredCol, header),
+            )
 
-        return JacocoReportSummary(
-            headerTitle = headerTitle,
-            packages = packages,
-        )
+            val packages = iterator.asSequence()
+                .map { line ->
+                    val columns = line.split(',')
+                    columns[header.getValue(PACKAGE)] to ClassCoverage(
+                        name = columns[header.getValue(CLASS)],
+                        line = columns.counter(LINE_MISSED, LINE_COVERED),
+                        branch = columns.counter(BRANCH_MISSED, BRANCH_COVERED),
+                        instruction = columns.counter(INSTRUCTION_MISSED, INSTRUCTION_COVERED),
+                    )
+                }
+                .groupBy({ it.first }, { it.second })
+                .map { (name, classes) -> PackageCoverage(name, classes.sortedBy(ClassCoverage::name)) }
+                .sortedBy(PackageCoverage::name).toList()
+
+            JacocoReportSummary(
+                headerTitle = headerTitle,
+                packages = packages,
+            )
+        }
     }
 
     private fun List<String>.getValue(
@@ -69,14 +75,5 @@ internal object JacocoReportSummary {
     ): Long {
         val raw = this[header.getValue(column)].trim()
         return checkNotNull(raw.toLongOrNull()) { "Valor inválido em $column: '$raw'" }
-    }
-
-    private fun File.extractLines(): List<String> {
-        return readLines().filter(String::isNotBlank)
-    }
-
-    private fun List<String>.extractHeader(): Map<String, Int> {
-        return first().split(',').withIndex()
-            .associate { (index, name) -> name.trim() to index }
     }
 }
