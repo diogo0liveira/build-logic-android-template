@@ -1,5 +1,10 @@
 package com.dao.convention.services
 
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.PrintStream
+import java.lang.reflect.Proxy
+import kotlin.test.assertTrue
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.tooling.events.FinishEvent
 import org.gradle.tooling.events.task.TaskFailureResult
@@ -9,11 +14,6 @@ import org.gradle.tooling.events.task.TaskSuccessResult
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.PrintStream
-import java.lang.reflect.Proxy
-import kotlin.test.assertTrue
 
 class CoverageReportLinkServiceTest {
 
@@ -30,10 +30,17 @@ class CoverageReportLinkServiceTest {
 
         val project = ProjectBuilder.builder().build()
 
-        reportHtmlFile = File(project.layout.buildDirectory.get().asFile, "reports/jacoco/jacocoTestReport/html/index.html")
-        reportCsvFile = File(project.layout.buildDirectory.get().asFile, "reports/jacoco/jacocoTestReport/jacocoTestReport.csv")
+        reportHtmlFile = File(
+            project.layout.buildDirectory.get().asFile,
+            "reports/jacoco/jacocoTestReport/html/index.html",
+        )
+        reportCsvFile =
+            File(project.layout.buildDirectory.get().asFile, "reports/jacoco/jacocoTestReport/jacocoTestReport.csv")
 
-        val serviceProvider = project.gradle.sharedServices.registerIfAbsent("testService", CoverageReportLinkService::class.java) {
+        val serviceProvider = project.gradle.sharedServices.registerIfAbsent(
+            "testService",
+            CoverageReportLinkService::class.java,
+        ) {
             parameters.task.set(":testTask")
             parameters.reportHtml.set(reportHtmlFile)
             parameters.reportCsv.set(reportCsvFile)
@@ -90,7 +97,9 @@ class CoverageReportLinkServiceTest {
     @Test
     fun testSuccessAndCsvFileExists() {
         reportCsvFile.parentFile.mkdirs()
-        reportCsvFile.writeText("GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED\n")
+        reportCsvFile.writeText(
+            "GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED\n",
+        )
         reportCsvFile.appendText("mygroup,mypackage,MyClass,0,10,0,2,0,5,0,1,0,1\n")
 
         val event = mockTaskFinishEvent(":testTask", isSuccess = true)
@@ -107,7 +116,9 @@ class CoverageReportLinkServiceTest {
         reportHtmlFile.createNewFile()
 
         reportCsvFile.parentFile.mkdirs()
-        reportCsvFile.writeText("GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED\n")
+        reportCsvFile.writeText(
+            "GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED\n",
+        )
         reportCsvFile.appendText("mygroup,mypackage,MyClass,0,10,0,2,0,5,0,1,0,1\n")
 
         val event = mockTaskFinishEvent(":testTask", isSuccess = true)
@@ -123,7 +134,7 @@ class CoverageReportLinkServiceTest {
     private inline fun <reified T> mock(noinline handler: (method: String) -> Any?): T {
         return Proxy.newProxyInstance(
             T::class.java.classLoader,
-            arrayOf(T::class.java)
+            arrayOf(T::class.java),
         ) { _, method, _ ->
             if (method.name == "toString") {
                 "Mock of ${T::class.simpleName}"
@@ -137,7 +148,10 @@ class CoverageReportLinkServiceTest {
         return mock { null }
     }
 
-    private fun mockTaskFinishEvent(taskPath: String, isSuccess: Boolean): TaskFinishEvent {
+    private fun mockTaskFinishEvent(
+        taskPath: String,
+        isSuccess: Boolean,
+    ): TaskFinishEvent {
         val descriptor = mock<TaskOperationDescriptor> { method ->
             when (method) {
                 "getTaskPath" -> taskPath
