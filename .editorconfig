@@ -1,0 +1,31 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+max_line_length = 120
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[.editorconfig]
+ij_editorconfig_space_after_comma = true
+ij_editorconfig_space_after_colon = false
+ij_editorconfig_space_before_comma = false
+ij_editorconfig_space_before_colon = false
+ij_editorconfig_align_group_field_declarations = false
+ij_editorconfig_spaces_around_assignment_operators = true
+
+# noinspection EditorConfigKeyCorrectness
+[*.{kt,kts}]
+ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+# ij_kotlin_keep_simple_blocks_in_one_line = false
+# ij_kotlin_keep_simple_methods_in_one_line = false
+# ij_kotlin_keep_simple_functions_in_one_line = false
+ktlint_code_style = android_studio
+ktlint_standard_function-expression-body = disabled
+ktlint_function_naming_ignore_when_annotated_with = Composable
+ktlint_standard_function-body-block-line-break = enabled
