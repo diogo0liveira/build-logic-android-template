@@ -14,7 +14,4 @@ internal inline fun <reified T : KotlinBaseExtension> Project.configureKotlin() 
         jvmToolchain(libs.versions.jvm.target.version.toInt())
         explicitApi()
     }
-    tasks.withType(org.gradle.api.tasks.testing.Test::class.java).configureEach {
-        useJUnitPlatform()
-    }
 }

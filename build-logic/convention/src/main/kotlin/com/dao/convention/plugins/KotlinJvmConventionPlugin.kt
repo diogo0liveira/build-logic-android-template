@@ -21,6 +21,10 @@ internal abstract class KotlinJvmConventionPlugin : Plugin<Project> {
 
             configureKotlin<KotlinBaseExtension>()
 
+            tasks.withType(org.gradle.api.tasks.testing.Test::class.java).configureEach {
+                useJUnitPlatform()
+            }
+
             dependencies {
                 testImplementation(libs.test.kotlin)
             }
