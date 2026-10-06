@@ -15,8 +15,8 @@ import org.gradle.tooling.events.task.TaskExecutionResult
 import org.gradle.tooling.events.task.TaskFailureResult
 import org.gradle.tooling.events.task.TaskFinishEvent
 import org.gradle.tooling.events.task.TaskSuccessResult
-import org.junit.After
-import org.junit.Before
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 
 class CoverageReportLinkServiceTest {
     private lateinit var reportHtmlFile: File
@@ -25,7 +25,7 @@ class CoverageReportLinkServiceTest {
     private val output = ByteArrayOutputStream()
     private val standardOut = System.out
 
-    @Before
+    @BeforeEach
     fun setup() {
         output.reset()
         System.setOut(PrintStream(output))
@@ -53,7 +53,7 @@ class CoverageReportLinkServiceTest {
         service = serviceProvider.get()
     }
 
-    @After
+    @AfterEach
     fun teardown() {
         clearAllMocks()
         System.setOut(standardOut)

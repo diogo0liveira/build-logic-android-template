@@ -7,18 +7,18 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import org.junit.After
-import org.junit.Before
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 
 class JacocoReportSummaryTest {
     private lateinit var csvFile: File
 
-    @Before
+    @BeforeEach
     fun setup() {
         csvFile = File.createTempFile("jacoco", ".csv")
     }
 
-    @After
+    @AfterEach
     fun teardown() {
         csvFile.delete()
     }
