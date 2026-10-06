@@ -32,6 +32,7 @@ dependencies {
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
 
+
     testImplementation(libs.test.junit)
     testImplementation(libs.test.kotlin)
     testImplementation(libs.test.mockk)
