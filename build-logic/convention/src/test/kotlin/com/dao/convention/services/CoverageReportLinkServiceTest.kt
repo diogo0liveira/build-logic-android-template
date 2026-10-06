@@ -6,7 +6,7 @@ import io.mockk.mockk
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.gradle.testfixtures.ProjectBuilder

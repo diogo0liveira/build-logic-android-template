@@ -2,7 +2,7 @@ package com.dao.convention.services.coverage
 
 import com.dao.convention.services.JacocoReportSummary
 import java.io.File
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
