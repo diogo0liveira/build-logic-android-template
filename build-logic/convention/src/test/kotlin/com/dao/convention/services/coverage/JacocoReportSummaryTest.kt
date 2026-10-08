@@ -2,23 +2,23 @@ package com.dao.convention.services.coverage
 
 import com.dao.convention.services.JacocoReportSummary
 import java.io.File
-import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import org.junit.After
-import org.junit.Before
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class JacocoReportSummaryTest {
     private lateinit var csvFile: File
 
-    @Before
+    @BeforeEach
     fun setup() {
         csvFile = File.createTempFile("jacoco", ".csv")
     }
 
-    @After
+    @AfterEach
     fun teardown() {
         csvFile.delete()
     }

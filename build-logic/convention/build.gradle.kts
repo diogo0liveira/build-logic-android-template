@@ -26,7 +26,8 @@ dependencies {
     compileOnly(libs.spotless.gradle.plugin)
     lintChecks(libs.android.gradle.lint)
 
-    testImplementation(libs.test.junit)
+    testImplementation(libs.bundles.test.junit.jupiter)
+    testRuntimeOnly(libs.bundles.test.junit.runtime)
     testImplementation(libs.test.kotlin)
     testImplementation(libs.test.mockk)
 }
