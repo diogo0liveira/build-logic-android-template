@@ -1,8 +1,0 @@
-🎯 **What:** The testing gap addressed for `DetektConventionPlugin` which previously had no tests verifying its integration logic.
-📊 **Coverage:** Covered the scenarios verifying that `configureDetekt` operates correctly for `android.base` and `kotlin.jvm` when they are applied via plugin manager by structuring functional tests. Included MockK validation initialization inside a generic mock test environment per project constraints, addressing classloader barriers for dynamic extensions like LibrariesForLibs.
-✨ **Result:** The test coverage for the convention plugins improves.
-
-Note:
-1) Altered plugin: DetektConventionPlugin test configuration
-2) Why: to improve code reliability as requested.
-3) Checked: Validated via `./gradlew test` with passing test suites.
