@@ -33,7 +33,7 @@ dependencies {
     implementation(libs.compose.lifecycle.viewmodel)
 
     testImplementation(libs.test.junit)
-    testImplementation(libs.test.kotlin)
+    testImplementation(libs.test.kotlin5)
     testImplementation(testFixtures(project(":module-jvm")))
 
     androidTestImplementation(libs.test.android.core)

@@ -1,5 +1,6 @@
 package com.dao.convention.plugins
 
+import com.dao.convention.configureJUnit6
 import com.dao.convention.configureKotlin
 import com.dao.convention.dependencies.apply
 import com.dao.convention.dependencies.libs
@@ -20,9 +21,11 @@ internal abstract class KotlinJvmConventionPlugin : Plugin<Project> {
             pluginManager.apply(LintConventionPlugin::class)
 
             configureKotlin<KotlinBaseExtension>()
+            configureJUnit6()
 
             dependencies {
-                testImplementation(libs.test.kotlin)
+                testImplementation(libs.test.junit)
+                testImplementation(libs.test.kotlin5)
             }
         }
     }
