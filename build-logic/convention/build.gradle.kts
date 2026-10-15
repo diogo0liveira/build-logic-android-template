@@ -31,7 +31,9 @@ dependencies {
     compileOnly(libs.spotless.gradle.plugin)
     lintChecks(libs.android.gradle.lint)
 
+    testImplementation(files(gradle.serviceOf<DependenciesAccessors>().classes.asFiles))
     testImplementation(platform(libs.test.junit6.bom))
+    testImplementation(libs.spotless.gradle.plugin)
     testImplementation(libs.test.junit)
     testImplementation(libs.test.junit6.jupiter)
     testImplementation(libs.test.kotlin5)
