@@ -3,6 +3,7 @@ package com.dao.convention.plugins
 import com.android.build.api.dsl.ApplicationExtension
 import com.dao.convention.androidCompileOptions
 import com.dao.convention.configureGradleManagedDevices
+import com.dao.convention.configureJUnit6
 import com.dao.convention.dependencies.apply
 import com.dao.convention.dependencies.libs
 import org.gradle.api.Plugin
@@ -23,6 +24,8 @@ internal abstract class AndroidApplicationConventionPlugin : Plugin<Project> {
                 androidCompileOptions(this)
                 configureGradleManagedDevices(this)
             }
+
+            configureJUnit6()
         }
     }
 }
