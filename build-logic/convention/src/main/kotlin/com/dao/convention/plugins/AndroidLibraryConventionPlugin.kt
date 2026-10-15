@@ -3,9 +3,9 @@ package com.dao.convention.plugins
 import com.android.build.api.dsl.LibraryExtension
 import com.dao.convention.androidCompileOptions
 import com.dao.convention.configureGradleManagedDevices
+import com.dao.convention.configureJUnit6
 import com.dao.convention.dependencies.androidTestImplementation
 import com.dao.convention.dependencies.apply
-import com.dao.convention.dependencies.implementation
 import com.dao.convention.dependencies.libs
 import com.dao.convention.dependencies.testImplementation
 import org.gradle.api.Plugin
@@ -29,9 +29,11 @@ internal abstract class AndroidLibraryConventionPlugin : Plugin<Project> {
                 configureGradleManagedDevices(this)
             }
 
+            configureJUnit6()
+
             dependencies {
                 testImplementation(libs.test.junit)
-                testImplementation(libs.test.kotlin)
+                testImplementation(libs.test.kotlin5)
                 androidTestImplementation(libs.test.android.junit)
                 androidTestImplementation(libs.test.android.rules)
                 androidTestImplementation(libs.test.android.runner)

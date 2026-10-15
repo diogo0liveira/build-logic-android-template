@@ -23,6 +23,16 @@ fun DependencyHandlerScope.testImplementation(dependency: Any) {
 }
 
 /**
+ * Adiciona uma dependência de execução de teste (somente runtime) ao projeto.
+ *
+ * @receiver O escopo do manipulador de dependências ao qual adicionar a dependência.
+ * @param dependency O item de dependência a ser adicionado.
+ */
+fun DependencyHandlerScope.testRuntimeOnly(dependency: Any) {
+    add("testRuntimeOnly", dependency)
+}
+
+/**
  * Adiciona uma dependência de implementação de teste do Android ao projeto.
  *
  * @receiver O escopo do manipulador de dependências ao qual adicionar a dependência.
