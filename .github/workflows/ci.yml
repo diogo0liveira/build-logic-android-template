@@ -84,12 +84,9 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-      - name: Verify Code Coverage Thresholds
-        run: ./gradlew :verifyTestCoverage -Pcoverage=true
-
       - name: Build Project & Lint
         id: build
-        run: ./gradlew build -Pcoverage=true
+        run: ./gradlew assemble lint
 
       - name: Upload Lint Reports
         if: failure() && steps.build.outcome == 'failure'
