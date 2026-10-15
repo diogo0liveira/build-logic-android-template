@@ -61,8 +61,12 @@ internal abstract class AndroidLibraryConventionPlugin : Plugin<Project> {
     }
 
     private fun resourcePrefixBuilder(path: String): String {
-        return path.split("""\W""".toRegex()).drop(1)
+        return path.split(SPLIT_MODULE_REGEX).drop(1)
             .distinct().joinToString(separator = "_")
             .lowercase() + "_"
+    }
+
+    companion object {
+        private val SPLIT_MODULE_REGEX = """\W""".toRegex()
     }
 }
