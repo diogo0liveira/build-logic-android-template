@@ -84,6 +84,16 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
+      - name: Upload Coverage to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: '**/build/reports/jacoco/reportTestCoverage/reportTestCoverage.xml'
+          fail_ci_if_error: true
+          disable_search: true
+          verbose: true
+
       - name: Build Project & Lint
         id: build
         run: ./gradlew assemble lint

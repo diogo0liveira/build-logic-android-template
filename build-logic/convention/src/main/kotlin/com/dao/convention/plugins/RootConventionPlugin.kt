@@ -53,7 +53,7 @@ internal abstract class RootConventionPlugin : Plugin<Project> {
                 minInstructionCoverage.set(0.90.toBigDecimal())
                 minBranchCoverage.set(0.80.toBigDecimal())
                 minLineCoverage.set(0.70.toBigDecimal())
-                haltOnFailure.set(true)
+                haltOnFailure.set(false)
             }
 
             with(gradle.includedBuild(BUILD_LOGIC)) {

@@ -38,11 +38,14 @@ internal abstract class CoverageReportTask @Inject constructor(
 
     init {
         reports.csv.required.set(true)
+        reports.xml.required.set(true)
         reports.html.required.set(true)
-        reports.xml.required.set(false)
 
         reports.csv.outputLocation.convention(
             layout.buildDirectory.file("reports/jacoco/$name/$name.csv"),
+        )
+        reports.xml.outputLocation.convention(
+            layout.buildDirectory.file("reports/jacoco/$name/$name.xml"),
         )
         reports.html.outputLocation.convention(
             layout.buildDirectory.dir("reports/jacoco/$name/html"),

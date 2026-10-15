@@ -1,5 +1,6 @@
 # Build Logic Android Template
 [![CI](https://github.com/diogo0liveira/build-logic-android-template/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/diogo0liveira/build-logic-android-template/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/diogo0liveira/build-logic-android-template/graph/badge.svg?token=X87EA571VD)](https://codecov.io/github/diogo0liveira/build-logic-android-template)
 
 O foco principal deste repositório é o **`build-logic`**, que centraliza toda a configuração de build (Gradle) do projeto. Os demais módulos incluídos (`:app`, `:module-feature`, `:module-core`, `:module-jvm`, etc.) servem apenas como **exemplos e playground** para demonstrar como consumir e aplicar estes plugins de conveniência.
 
