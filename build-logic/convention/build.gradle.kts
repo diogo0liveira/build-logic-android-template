@@ -17,6 +17,11 @@ tasks {
         enableStricterValidation = true
         failOnWarning = true
     }
+
+    withType<Test>().configureEach {
+        useJUnitPlatform()
+        systemProperty("junit.vintage.discovery.issue.reporting.enabled", "false")
+    }
 }
 
 dependencies {
@@ -26,9 +31,14 @@ dependencies {
     compileOnly(libs.spotless.gradle.plugin)
     lintChecks(libs.android.gradle.lint)
 
+    testImplementation(platform(libs.test.junit6.bom))
     testImplementation(libs.test.junit)
-    testImplementation(libs.test.kotlin)
+    testImplementation(libs.test.junit6.jupiter)
+    testImplementation(libs.test.kotlin5)
     testImplementation(libs.test.mockk)
+
+    testRuntimeOnly(libs.test.junit6.launcher)
+    testRuntimeOnly(libs.test.junit6.vintage)
 }
 
 gradlePlugin {

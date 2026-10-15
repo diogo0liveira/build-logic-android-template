@@ -1,7 +1,7 @@
 package com.dao.android.module.jvm
 
+import kotlin.test.Test
 import kotlin.test.assertEquals
-import org.junit.Test
 
 internal class GreetingRepositoryTest {
     private val repository: GreetingRepository = DefaultGreetingRepository()
