@@ -1,13 +1,13 @@
 [versions]
 agp = "9.4.1"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 jvm-target = "26"
 detekt = "2.0.0-alpha.6"
 hilt = "2.60.1"
 jacoco = "0.8.15"
 ksp = "2.3.12"
 ktlint = "1.8.0"
-spotless = "8.10.3"
+spotless = "8.10.4"
 
 android-appcompat = "1.8.0"
 android-core = "1.19.1"
@@ -17,8 +17,8 @@ android-material = "1.14.0"
 
 compose-bom = "2026.09.00"
 compose-activity = "1.13.0"
-compose-rules = "0.6.7"
-compose-slack-lint = "1.6.0"
+compose-rules = "0.6.8"
+compose-slack-lint = "1.6.1"
 compose-twitter-rules = "0.0.26"
 
 test-android = "1.7.0"
@@ -26,7 +26,7 @@ test-android-junit = "1.3.0"
 test-espresso = "3.7.0"
 test-junit = "4.13.2"
 test-junit6 = "6.1.3"
-test-mockk = "1.14.7"
+test-mockk = "1.14.11"
 test-robolectric = "4.17"
 
 [plugins]
