@@ -14,6 +14,24 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
+/**
+ * Plugin de convenção para bibliotecas Android reutilizáveis (`convention.android.library`).
+ *
+ * Responsabilidades:
+ * - Aplica o plugin oficial do Android Library (`com.android.library`).
+ * - Aplica plugins de qualidade e cobertura: [JacocoAndroidConventionPlugin],
+ *   [SpotlessConventionPlugin], [DetektConventionPlugin] e [LintConventionPlugin].
+ * - Define automaticamente o `resourcePrefix` baseado no caminho do módulo no projeto.
+ * - Configura opções de compilação Android, GMD e JUnit 6.
+ * - Injeta as dependências base de teste unitário e instrumentado (JUnit 4, Kotlin test, Android Test runners).
+ *
+ * Exemplo de uso em `module-core/build.gradle.kts`:
+ * ```kotlin
+ * plugins {
+ *     alias(libs.plugins.convention.android.library)
+ * }
+ * ```
+ */
 internal abstract class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {

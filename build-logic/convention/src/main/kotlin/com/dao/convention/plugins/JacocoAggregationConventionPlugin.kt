@@ -20,6 +20,12 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 
+/**
+ * Plugin de convenção interno responsável por orquestrar a agregação de cobertura JaCoCo no projeto raiz.
+ *
+ * Cria a configuração resolúvel `coverageDataConsumer`, expõe as extensões [JacocoAggregationExtension]
+ * e [JacocoVerificationExtension], e registra a tarefa global `coverageTestReport`.
+ */
 internal abstract class JacocoAggregationConventionPlugin @Inject constructor(
     private val registry: BuildEventsListenerRegistry,
 ) : Plugin<Project> {

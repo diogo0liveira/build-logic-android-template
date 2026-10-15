@@ -89,7 +89,7 @@ jobs:
 
       - name: Build Project & Lint
         id: build
-        run: ./gradlew build
+        run: ./gradlew build -Pcoverage=true
 
       - name: Upload Lint Reports
         if: failure() && steps.build.outcome == 'failure'

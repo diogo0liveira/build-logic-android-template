@@ -20,6 +20,12 @@ import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 
+/**
+ * Plugin de convenção interno para habilitar cobertura de código JaCoCo em módulos JVM puros.
+ *
+ * Vincula a saída de compilação do `SourceSet.main` às tarefas de relatório local
+ * e publica os artefatos de cobertura na configuração consumível `coverageDataProducer`.
+ */
 internal abstract class JacocoJvmConventionPlugin @Inject constructor(
     private val registry: BuildEventsListenerRegistry,
 ) : Plugin<Project> {

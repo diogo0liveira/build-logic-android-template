@@ -1,3 +1,5 @@
+import com.dao.convention.extensions.JacocoAggregationExtension
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -8,4 +10,13 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.convention.root)
+}
+
+configure<JacocoAggregationExtension> {
+    modules.addAll(
+        ":app",
+        ":module-feature",
+        ":module-core",
+        ":module-jvm",
+    )
 }
