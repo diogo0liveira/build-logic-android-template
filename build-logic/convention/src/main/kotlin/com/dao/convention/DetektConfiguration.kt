@@ -39,6 +39,7 @@ internal fun Project.configureDetekt(
     }
 
     tasks.withType<Detekt>().configureEach {
+        // Mantém fixado na JVM 21 devido ao limite de suporte do compilador/bytecode embutido no Detekt 2.x
         jvmTarget.set(JavaVersion.VERSION_21.toString())
 
         reports {

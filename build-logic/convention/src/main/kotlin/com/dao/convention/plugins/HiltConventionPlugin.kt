@@ -9,6 +9,24 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
+/**
+ * Plugin de convenção para injeção de dependência com Dagger Hilt (`convention.hilt`).
+ *
+ * Configura o processador de anotações KSP e adapta as dependências conforme o tipo de módulo.
+ *
+ * Responsabilidades:
+ * - Aplica o plugin KSP (`com.google.devtools.ksp`) e injeta `hilt-compiler`.
+ * - Em módulos Android: aplica o plugin `dagger.hilt.android` e injeta `hilt-android`.
+ * - Em módulos JVM puros: injeta `hilt-core`.
+ *
+ * Exemplo de uso:
+ * ```kotlin
+ * plugins {
+ *     alias(libs.plugins.convention.android.library)
+ *     alias(libs.plugins.convention.hilt)
+ * }
+ * ```
+ */
 internal abstract class HiltConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {

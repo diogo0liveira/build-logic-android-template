@@ -31,10 +31,9 @@ internal val JACOCO_EXCLUDE_PATTERNS = listOf(
     // Kotlin
     $$"**/*$WhenMappings.*",
     "**/*Kt$*.class", // top-level funções lambda internas
-    "**/*JsonAdapter.*", // Moshi
+    "**/*JsonAdapter.*", // Moshi generated adapters
     "**/*_Impl.*", // Room DAOs/Database
     $$"**/*$serializer.*", // kotlinx.serialization
-    "**/*JsonAdapter.*", // Moshi generated adapters
     // Hilt/Dagger
     "dagger/**",
     "**/*_Factory*",
@@ -42,13 +41,9 @@ internal val JACOCO_EXCLUDE_PATTERNS = listOf(
     "**/*_ComponentTreeDeps*",
     "**/*_MembersInjector*",
     "**/*_Provide*Factory*",
-    "**/*_Factory.*",
     "**/*Module_*Factory.*",
-    "**/*_MembersInjector.*",
     "**/Dagger*Component*.*",
-    "**/*_HiltModules*.*",
     "**/*_HiltComponents*.*",
-    "hilt_aggregated_deps/**",
     "**/hilt_aggregated_deps/**",
     "**/*_HiltModules*",
     "**/HiltWrapper_*",

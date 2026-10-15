@@ -45,12 +45,6 @@ Toda configuração de build, gerenciamento de dependências e ferramentas (lint
 
 ```
 .
-├── .agents/
-│   └── skills/                            # ← skills compartilhadas (Agent Skills open standard)
-│       ├── version-catalog/SKILL.md       #    padronização do libs.versions.toml
-│       └── gradle-dependencies/SKILL.md   #    padronização dos blocos dependencies{} em build.gradle.kts
-├── .claude/
-│   └── skills -> ../.agents/skills        # ← symlink para o Claude Code enxergar as mesmas skills
 ├── build-logic/
 │   └── convention/
 │       └── src/main/kotlin/com/dao/convention/plugins/   # ← plugins Gradle customizados (fonte da verdade)
@@ -71,16 +65,16 @@ Toda configuração de build, gerenciamento de dependências e ferramentas (lint
 - ℹ️ **Dependências específicas de módulo**: podem ser adicionadas diretamente no `build.gradle.kts` do módulo específico (referenciando `libs.versions.toml`), desde que sejam exclusivas daquele módulo.
 - 🔴 Nunca declare uma dependência com versão *hardcoded* fora do `libs.versions.toml` — mesmo em um módulo de exemplo.
 
-### 2.1 Skills locais obrigatórias para este domínio
+### 2.1 Skills globais obrigatórias para este domínio
 
-Este repositório possui duas skills locais especializadas em dependências, escritas no formato **Agent Skills** (`SKILL.md` com frontmatter `name`/`description`). Esse é um padrão aberto lido tanto pelo **Claude Code** quanto pelo **Gemini no Android Studio** (Agent Mode → "Extend Agent Mode with skills"), então uma única fonte de verdade serve os dois agentes.
+Este domínio é coberto por duas skills especializadas em dependências, escritas no formato **Agent Skills** (`SKILL.md` com frontmatter `name`/`description`). Elas **não fazem parte deste repositório**: ficam no escopo **global** do ambiente do desenvolvedor, em `~/.gemini/skills/`, e são compartilhadas entre todos os projetos.
 
 🔴 **Sempre que a tarefa envolver `libs.versions.toml` ou o bloco `dependencies { }` de um `build.gradle.kts`, leia o `SKILL.md` correspondente ANTES de editar** — não confie apenas na memória das regras resumidas abaixo.
 
-| Skill                 | Local (fonte)                                 | Quando usar                                                                                                                                                                                                                                                                    |
-|-----------------------|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `version-catalog`     | `.agents/skills/version-catalog/SKILL.md`     | Adicionar, remover, renomear ou reorganizar entradas em `gradle/libs.versions.toml` (seções `[versions]`, `[plugins]`, `[libraries]`, `[bundles]`; nomenclatura de aliases em kebab-case; ordenação e posicionamento de BOM).                                                  |
-| `gradle-dependencies` | `.agents/skills/gradle-dependencies/SKILL.md` | Adicionar, remover ou reorganizar dependências dentro de qualquer `build.gradle.kts` (ordem `api` → `implementation` → `testImplementation` → `androidTestImplementation` → `debugImplementation`; ordenação alfabética; prioridade de BOM; posicionamento de `testFixtures`). |
+| Skill                 | Local (global)                                  | Quando usar                                                                                                                                                                                                                                                                    |
+|-----------------------|-------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `version-catalog`     | `~/.gemini/skills/version-catalog/SKILL.md`     | Adicionar, remover, renomear ou reorganizar entradas em `gradle/libs.versions.toml` (seções `[versions]`, `[plugins]`, `[libraries]`, `[bundles]`; nomenclatura de aliases em kebab-case; ordenação e posicionamento de BOM).                                                  |
+| `gradle-dependencies` | `~/.gemini/skills/gradle-dependencies/SKILL.md` | Adicionar, remover ou reorganizar dependências dentro de qualquer `build.gradle.kts` (ordem `api` → `implementation` → `testImplementation` → `androidTestImplementation` → `debugImplementation`; ordenação alfabética; prioridade de BOM; posicionamento de `testFixtures`). |
 
 Resumo rápido do protocolo de cada uma (a versão completa no `SKILL.md` prevalece em caso de dúvida):
 
@@ -89,12 +83,11 @@ Resumo rápido do protocolo de cada uma (a versão completa no `SKILL.md` preval
 
 ⚠️ Como as duas skills se sobrepõem no fluxo (mudar um, aliás no catálogo normalmente exige atualizar as referências no `build.gradle.kts`), ao fazer uma refatoração ampla de dependências aplique primeiro `version-catalog` e só então `gradle-dependencies`, nessa ordem.
 
-#### Onde cada agente procura as skills
+#### Onde as skills ficam
 
-- 🔴 **Fonte única**: mantenha os arquivos reais em `.agents/skills/` — esse é o diretório padrão do Gemini no Android Studio (a partir da versão *Quail*; versões anteriores usavam `.skills/` ou `.agent/skills/`, hoje legado).
-- ⚠️ **Claude Code** procura em `.claude/skills/`. Em vez de duplicar o conteúdo, mantenha `.claude/skills` como *symlink* para `.agents/skills` (`ln -s ../.agents/skills .claude/skills`), garantindo que os dois agentes leiam o mesmo `SKILL.md` — sem risco de divergência entre cópias.
-- ℹ️ No Gemini/Android Studio, a skill pode ser acionada automaticamente (o modelo decide com base na `description` do frontmatter) ou manualmente digitando `@nome-da-skill` no chat do Agent Mode.
-- ℹ️ Se seu ambiente não suportar *symlinks* (ex.: alguns runners de CI no Windows), duplique os dois arquivos e adicione um lembrete no PR para mantê-los sincronizados manualmente.
+- 🔴 **Escopo global**: as skills residem em `~/.gemini/skills/` na máquina do desenvolvedor. **Não** copie nem crie *symlinks* delas dentro do repositório (`.agents/skills/`, `.claude/skills/`) — o repositório não é a fonte dessas regras.
+- ℹ️ O agente carrega as skills globais automaticamente (com base na `description` do frontmatter) ou sob demanda, digitando `@nome-da-skill` no chat.
+- ⚠️ Se a skill não estiver disponível no ambiente, não presuma as regras: siga o resumo acima e avise o humano de que a skill global está ausente.
 
 ---
 

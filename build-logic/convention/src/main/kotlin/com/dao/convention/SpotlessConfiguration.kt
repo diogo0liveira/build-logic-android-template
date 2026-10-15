@@ -19,13 +19,13 @@ internal fun Project.configureSpotless(
         kotlinGradle {
             target(listOf("*.gradle.kts") + gradleTargets)
             ktlint(libs.versions.ktlint.version)
-                .setEditorConfigPath("$rootDir/.editorconfig")
+                .setEditorConfigPath(projectDirectory.file(".editorconfig"))
         }
 
         kotlin {
             target(listOf("src/*/kotlin/**/*.kt") + kotlinTargets)
             val config = ktlint(libs.versions.ktlint.version)
-                .setEditorConfigPath("$rootDir/.editorconfig")
+                .setEditorConfigPath(projectDirectory.file(".editorconfig"))
 
             pluginManager.withPlugin(libs.plugins.kotlin.compose) {
                 config.customRuleSets(listOf(libs.ktlint.compose.rules.get().toString()))
