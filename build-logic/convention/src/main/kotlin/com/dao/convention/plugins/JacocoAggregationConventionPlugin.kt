@@ -3,9 +3,12 @@ package com.dao.convention.plugins
 import com.dao.convention.createJacocoResolvableConfiguration
 import com.dao.convention.dependencies.libs
 import com.dao.convention.dependencies.version
+import com.dao.convention.extensions.JacocoAggregationExtension
+import com.dao.convention.extensions.JacocoVerificationExtension
 import com.dao.convention.extensions.createJacocoAggregationExtension
 import com.dao.convention.extensions.createJacocoVerificationExtension
 import com.dao.convention.tasks.register.registerCoverageTask
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.build.event.BuildEventsListenerRegistry
@@ -13,8 +16,13 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
-import javax.inject.Inject
 
+/**
+ * Plugin de convenção interno responsável por orquestrar a agregação de cobertura JaCoCo no projeto raiz.
+ *
+ * Cria a configuração resolúvel `coverageDataConsumer`, expõe as extensões [JacocoAggregationExtension]
+ * e [JacocoVerificationExtension], e registra a tarefa global `coverageTestReport`.
+ */
 internal abstract class JacocoAggregationConventionPlugin @Inject constructor(
     private val registry: BuildEventsListenerRegistry,
 ) : Plugin<Project> {

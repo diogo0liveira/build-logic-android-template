@@ -24,6 +24,13 @@ import org.gradle.testing.jacoco.plugins.JacocoPlugin
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
 
+/**
+ * Plugin de convenção interno para habilitar cobertura de código JaCoCo em módulos Android.
+ *
+ * Quando a cobertura estiver ativada via `-Pcoverage`, habilita a instrumentação de testes unitários
+ * e testes instrumentados no buildType `debug`, expondo artefatos compilados via `ScopedArtifact.CLASSES`
+ * para tarefas locais e para a configuração consumível `coverageDataProducer`.
+ */
 internal abstract class JacocoAndroidConventionPlugin @Inject constructor(
     private val registry: BuildEventsListenerRegistry,
 ) : Plugin<Project> {

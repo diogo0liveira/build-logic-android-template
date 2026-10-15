@@ -9,16 +9,18 @@ Este projeto serve como um modelo fundacional, onde os plugins de convenção cu
 
 ## 0. Início rápido (leia antes de tocar em qualquer coisa)
 
-| Ação                            | Comando                                   |
-|---------------------------------|-------------------------------------------|
-| Build completo                  | `./gradlew build`                         |
-| Rodar testes (todos os módulos) | `./gradlew test`                          |
-| Rodar testes de um módulo       | `./gradlew :module-core:test`             |
-| Relatório/verificação cobertura | `./gradlew coverageTestReport -Pcoverage` |
-| Lint/format check (Spotless)    | `./gradlew spotlessCheck`                 |
-| Aplicar formatação (Spotless)   | `./gradlew spotlessApply`                 |
-| Análise estática (Detekt)       | `./gradlew detekt`                        |
-| Build + todas as verificações   | `./gradlew check`                         |
+| Ação                            | Comando                                    |
+|---------------------------------|--------------------------------------------|
+| Build completo                  | `./gradlew build`                          |
+| Rodar testes (todos os módulos) | `./gradlew test`                           |
+| Rodar testes de um módulo       | `./gradlew :module-core:test`              |
+| Rodar testes do build-logic     | `./gradlew :build-logic:convention:test`   |
+| Relatório/verificação cobertura | `./gradlew coverageTestReport -Pcoverage`  |
+| Lint/format check (Spotless)    | `./gradlew spotlessCheck`                  |
+| Aplicar formatação (Spotless)   | `./gradlew spotlessApply`                  |
+| Análise estática (Detekt)       | `./gradlew detekt`                         |
+| Detekt no build-logic           | `./gradlew :build-logic:convention:detekt` |
+| Build + todas as verificações   | `./gradlew check`                          |
 
 > ℹ️ Ajuste os nomes das tasks acima caso divirjam dos aliases reais definidos em `build-logic/convention` — se um comando aqui estiver desatualizado, corrija esta tabela ao invés de ignorá-la silenciosamente.
 
@@ -45,12 +47,6 @@ Toda configuração de build, gerenciamento de dependências e ferramentas (lint
 
 ```
 .
-├── .agents/
-│   └── skills/                            # ← skills compartilhadas (Agent Skills open standard)
-│       ├── version-catalog/SKILL.md       #    padronização do libs.versions.toml
-│       └── gradle-dependencies/SKILL.md   #    padronização dos blocos dependencies{} em build.gradle.kts
-├── .claude/
-│   └── skills -> ../.agents/skills        # ← symlink para o Claude Code enxergar as mesmas skills
 ├── build-logic/
 │   └── convention/
 │       └── src/main/kotlin/com/dao/convention/plugins/   # ← plugins Gradle customizados (fonte da verdade)
@@ -63,6 +59,18 @@ Toda configuração de build, gerenciamento de dependências e ferramentas (lint
 └── AGENTS.md
 ```
 
+### Plugins de Convenção Disponíveis
+
+| Alias no Catálogo (`libs.plugins...`) | Plugin ID                        | Classe de Implementação              | Propósito                                                        |
+|---------------------------------------|----------------------------------|--------------------------------------|------------------------------------------------------------------|
+| `convention.root`                     | `convention.root`                | `RootConventionPlugin`               | Configuração raiz do projeto, agregação Jacoco e Spotless global |
+| `convention.android.application`      | `convention.android.application` | `AndroidApplicationConventionPlugin` | Aplicação Android executável (`:app`)                            |
+| `convention.android.library`          | `convention.android.library`     | `AndroidLibraryConventionPlugin`     | Bibliotecas Android padrão (`:module-core`, etc.)                |
+| `convention.android.feature`          | `convention.android.feature`     | `AndroidFeatureConventionPlugin`     | Módulos de feature Android (`:module-feature`)                   |
+| `convention.android.compose`          | `convention.android.compose`     | `AndroidComposeConventionPlugin`     | Suporte e dependências do Jetpack Compose                        |
+| `convention.kotlin.jvm`               | `convention.kotlin.jvm`          | `KotlinJvmConventionPlugin`          | Módulos Kotlin/JVM puros sem dependência Android (`:module-jvm`) |
+| `convention.hilt`                     | `convention.hilt`                | `HiltConventionPlugin`               | Injeção de dependência via Dagger Hilt                           |
+
 ---
 
 ## 2. Gerenciamento de Dependências
@@ -71,30 +79,30 @@ Toda configuração de build, gerenciamento de dependências e ferramentas (lint
 - ℹ️ **Dependências específicas de módulo**: podem ser adicionadas diretamente no `build.gradle.kts` do módulo específico (referenciando `libs.versions.toml`), desde que sejam exclusivas daquele módulo.
 - 🔴 Nunca declare uma dependência com versão *hardcoded* fora do `libs.versions.toml` — mesmo em um módulo de exemplo.
 
-### 2.1 Skills locais obrigatórias para este domínio
+### 2.1 Skills globais obrigatórias para este domínio
 
-Este repositório possui duas skills locais especializadas em dependências, escritas no formato **Agent Skills** (`SKILL.md` com frontmatter `name`/`description`). Esse é um padrão aberto lido tanto pelo **Claude Code** quanto pelo **Gemini no Android Studio** (Agent Mode → "Extend Agent Mode with skills"), então uma única fonte de verdade serve os dois agentes.
+Este domínio é coberto por duas skills especializadas em dependências, escritas no formato **Agent Skills** (`SKILL.md` com frontmatter `name`/`description`). Elas **não fazem parte deste repositório**: ficam no escopo **global** do ambiente do desenvolvedor, em `~/.gemini/skills/`, e são compartilhadas entre todos os projetos.
 
 🔴 **Sempre que a tarefa envolver `libs.versions.toml` ou o bloco `dependencies { }` de um `build.gradle.kts`, leia o `SKILL.md` correspondente ANTES de editar** — não confie apenas na memória das regras resumidas abaixo.
 
-| Skill                 | Local (fonte)                                 | Quando usar                                                                                                                                                                                                                                                                    |
-|-----------------------|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `version-catalog`     | `.agents/skills/version-catalog/SKILL.md`     | Adicionar, remover, renomear ou reorganizar entradas em `gradle/libs.versions.toml` (seções `[versions]`, `[plugins]`, `[libraries]`, `[bundles]`; nomenclatura de aliases em kebab-case; ordenação e posicionamento de BOM).                                                  |
-| `gradle-dependencies` | `.agents/skills/gradle-dependencies/SKILL.md` | Adicionar, remover ou reorganizar dependências dentro de qualquer `build.gradle.kts` (ordem `api` → `implementation` → `testImplementation` → `androidTestImplementation` → `debugImplementation`; ordenação alfabética; prioridade de BOM; posicionamento de `testFixtures`). |
+| Skill                 | Local (global)                                  | Quando usar                                                                                                                                                                                                                                                                    |
+|-----------------------|-------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `version-catalog`     | `~/.gemini/skills/version-catalog/SKILL.md`     | Adicionar, remover, renomear ou reorganizar entradas em `gradle/libs.versions.toml` (seções `[versions]`, `[plugins]`, `[libraries]`, `[bundles]`; nomenclatura de aliases em kebab-case; ordenação e posicionamento de BOM).                                                  |
+| `gradle-dependencies` | `~/.gemini/skills/gradle-dependencies/SKILL.md` | Adicionar, remover ou reorganizar dependências dentro de qualquer `build.gradle.kts` (ordem `api` → `implementation` → `testImplementation` → `androidTestImplementation` → `debugImplementation`; ordenação alfabética; prioridade de BOM; posicionamento de `testFixtures`). |
 
 Resumo rápido do protocolo de cada uma (a versão completa no `SKILL.md` prevalece em caso de dúvida):
 
-- **`version-catalog`**: reestruturar o TOML nas 4 seções obrigatórias → padronizar aliases (kebab-case, regras de transformação por contexto) → atualizar todas as referências afetadas em `build.gradle.kts` → rodar `gradle_sync`.
-- **`gradle-dependencies`**: `gradle_sync` inicial → reorganizar respeitando grupos de configuração, BOM e ordenação alfabética → `gradle_sync` final para validar.
+- **`version-catalog`**: reestruturar o TOML nas 4 seções obrigatórias → padronizar aliases (kebab-case, regras de transformação por contexto) → atualizar todas as referências afetadas em `build.gradle.kts` → rodar validação de sincronização.
+- **`gradle-dependencies`**: validação inicial → reorganizar respeitando grupos de configuração, BOM e ordenação alfabética → validação final.
+- ℹ️ **Sincronização via CLI (`gradle_sync`)**: Em ambiente de linha de comando (sem IDE), o passo `gradle_sync` das skills corresponde a executar `./gradlew help` ou `./gradlew dependencies` para confirmar que o grafo de dependências resolve sem erros.
 
 ⚠️ Como as duas skills se sobrepõem no fluxo (mudar um, aliás no catálogo normalmente exige atualizar as referências no `build.gradle.kts`), ao fazer uma refatoração ampla de dependências aplique primeiro `version-catalog` e só então `gradle-dependencies`, nessa ordem.
 
-#### Onde cada agente procura as skills
+#### Onde as skills ficam
 
-- 🔴 **Fonte única**: mantenha os arquivos reais em `.agents/skills/` — esse é o diretório padrão do Gemini no Android Studio (a partir da versão *Quail*; versões anteriores usavam `.skills/` ou `.agent/skills/`, hoje legado).
-- ⚠️ **Claude Code** procura em `.claude/skills/`. Em vez de duplicar o conteúdo, mantenha `.claude/skills` como *symlink* para `.agents/skills` (`ln -s ../.agents/skills .claude/skills`), garantindo que os dois agentes leiam o mesmo `SKILL.md` — sem risco de divergência entre cópias.
-- ℹ️ No Gemini/Android Studio, a skill pode ser acionada automaticamente (o modelo decide com base na `description` do frontmatter) ou manualmente digitando `@nome-da-skill` no chat do Agent Mode.
-- ℹ️ Se seu ambiente não suportar *symlinks* (ex.: alguns runners de CI no Windows), duplique os dois arquivos e adicione um lembrete no PR para mantê-los sincronizados manualmente.
+- 🔴 **Escopo global**: as skills residem em `~/.gemini/skills/` na máquina do desenvolvedor. **Não** copie nem crie *symlinks* delas dentro do repositório (`.agents/skills/`, `.claude/skills/`) — o repositório não é a fonte dessas regras.
+- ℹ️ O agente carrega as skills globais automaticamente (com base na `description` do frontmatter) ou sob demanda, digitando `@nome-da-skill` no chat.
+- ⚠️ Se a skill não estiver disponível no ambiente, não presuma as regras: siga o resumo acima e avise o humano de que a skill global está ausente.
 
 ---
 
@@ -143,39 +151,48 @@ Os módulos `:app`, `:module-feature`, `:module-core` e `:module-jvm` demonstram
 
 ## 7. Convenções de Commit / PR
 
-This repository strictly enforces commit message guidelines using `commitlint`. Every commit message and Pull Request title generated by you MUST strictly adhere to the Conventional Commits specification.
+Este repositório aplica rigorosamente as diretrizes de mensagens de commit utilizando `commitlint` (`@commitlint/config-conventional`). Toda mensagem de commit e título de Pull Request gerado DEVE seguir a especificação do Conventional Commits.
 
-### Required Format:
+### 🔴 Formato Obrigatório:
 `<type>(<optional scope>): <short description in lowercase>`
 
-### Allowed Types:
-- `feat`: A new feature.
-- `fix`: A bug fix.
-- `docs`: Documentation only changes.
-- `style`: Changes that do not affect the meaning of the code (white-space, formatting, missing semicolons, etc.).
-- `refactor`: A code change that neither fixes a bug nor adds a feature.
-- `perf`: A code change that improves performance.
-- `test`: Adding missing tests or correcting existing tests.
-- `build`: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm).
-- `ci`: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs).
-- `chore`: Other changes that don't modify src or test files.
-- `revert`: Reverts a previous commit.
+🔴 **Idioma da mensagem e título**: Embora este documento esteja em português, o texto da mensagem de commit e o título do PR DEVEM ser redigidos em **inglês**, preservando o histórico do repositório (`git log`).
 
-### Additional Rules:
-- The subject line must be written in lowercase.
-- Do not end the subject line with a period (.).
-- Keep the subject line concise (maximum of 72 characters).
-- Use the imperative mood in the description (e.g., "add feature" instead of "added feature" or "adds feature").
-- If the task resolves a specific issue, link it in the body using keywords (e.g., `Fixes #123`).
+### 🔴 Tipos Permitidos:
+- `feat`: Uma nova funcionalidade ou plugin de convenção.
+- `fix`: Uma correção de bug em plugin ou código existente.
+- `docs`: Alterações exclusivamente em documentação (`README.md`, `AGENTS.md`, KDoc).
+- `style`: Alterações de formatação e estilo que não afetam a semântica do código (espaçamento, Spotless, etc.).
+- `refactor`: Refatoração de código que não corrige bug nem adiciona funcionalidade.
+- `perf`: Mudança de código que melhora o desempenho (ex.: otimização de compilação, regex).
+- `test`: Adição de novos testes ou correção de testes existentes.
+- `build`: Mudanças que afetam o sistema de build, plugins de convenção ou dependências externas (escopos: `build-logic`, `deps`, `catalog`).
+- `ci`: Mudanças em arquivos e scripts de configuração da CI (escopo: `.github/workflows/ci.yml`).
+- `chore`: Outras tarefas de manutenção rotineira que não modificam arquivos de código-fonte ou testes.
+- `revert`: Reverte um commit anterior.
 
-- ⚠️ Se a mudança for em um plugin de convenção, prefixe o escopo: `feat(build-logic): ...`.
-- ℹ️ No corpo do PR, indique: (1) qual plugin de convenção foi alterado, (2) por que, (3) quais módulos consumidores foram validados (`./gradlew build` local).
+### 🔴 Regras de Formatação:
+- A linha de assunto (subject) DEVE ser escrita inteiramente em letras minúsculas.
+- NÃO termine a linha de assunto com ponto final (`.`).
+- Mantenha a linha de assunto concisa (máximo de 72 caracteres).
+- Use o modo imperativo em inglês na descrição (ex.: `"add feature"` em vez de `"added feature"` ou `"adds feature"`).
+- Se a tarefa resolver uma issue específica, referencie-a no corpo usando palavras-chave (ex.: `Fixes #123`).
+
+### ⚠️ Escopos e Boas Práticas:
+- ⚠️ Se a mudança for em um plugin de convenção, use o escopo correspondente: `feat(build-logic): ...` ou `fix(build-logic): ...`.
+- ⚠️ Para atualizações de dependências, utilize o escopo: `chore(deps): ...` ou `build(deps): ...`.
+- ℹ️ No corpo do PR, indique claramente:
+  1. Qual plugin de convenção ou módulo foi alterado.
+  2. O motivo da alteração.
+  3. Quais comandos locais foram validados (ex.: `./gradlew build`, `./gradlew spotlessApply`, `./gradlew detekt`).
 
 ---
 
 ## 8. Limites de Segurança & Disciplina de Escopo
 
-- 🔴 **Aprovação prévia e escopo estrito**: Nunca altere código, arquivos ou configurações que não sejam estritamente necessários para a tarefa solicitada ou que não tenham sido previamente aprovados pelo usuário.
+- 🔴 **Proibição estrita de adivinhação e desvio de plano**: se durante a implementação for identificado que o que foi planejado não é possível de ser entregue como desenhado, ou surgir qualquer dúvida/impedimento técnico, você DEVE PARAR IMEDIATAMENTE. Nunca tente "adivinhar", improvisar contornos silenciosos ou entregar algo divergente do que foi aprovado no plano. Reporte o impedimento com precisão ao usuário e aguarde nova decisão/replanejamento.
+- 🔴 **Aprovação prévia e escopo estrito**: nunca altere código, arquivos ou configurações que não sejam estritamente necessários para a tarefa solicitada ou que não tenham sido previamente aprovados pelo usuário.
 - 🔴 Nunca commit segredos, chaves de API, keystores ou credenciais de assinatura.
 - 🔴 Nunca modifique `gradle/wrapper/gradle-wrapper.properties` para apontar a uma distribuição do Gradle não oficial.
 - ⚠️ Mudanças em `settings.gradle.kts` (inclusão/remoção de módulos) devem ser explicitadas claramente no PR, pois afetam todo o grafo de build.
+- ⚠️ **Minimização de ruído**: não realize refatorações cosméticas em arquivos alheios ao escopo da tarefa e preserve comentários e documentações existentes.

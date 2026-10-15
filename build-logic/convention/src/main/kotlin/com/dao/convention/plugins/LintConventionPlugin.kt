@@ -11,6 +11,12 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
+/**
+ * Plugin de convenção interno para execução unificada do Android Lint.
+ *
+ * Parametriza a verificação estática de severidades, baselines e checagem de fontes de teste
+ * em módulos Android Application, Android Library e módulos JVM puros.
+ */
 internal abstract class LintConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {

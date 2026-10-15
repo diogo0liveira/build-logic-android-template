@@ -11,6 +11,25 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 
+/**
+ * Plugin de convenção para módulos JVM puros (`convention.kotlin.jvm`).
+ *
+ * Destinado a módulos de regras de negócio ou utilitários agnósticos ao SDK Android.
+ *
+ * Responsabilidades:
+ * - Aplica o plugin do Kotlin JVM (`org.jetbrains.kotlin.jvm`).
+ * - Aplica plugins de qualidade e cobertura JVM: [JacocoJvmConventionPlugin],
+ *   [SpotlessConventionPlugin], [DetektConventionPlugin] e [LintConventionPlugin].
+ * - Configura jvmToolchain e modo `explicitApi` via [configureKotlin].
+ * - Configura JUnit 6 (Jupiter) e injeta bibliotecas base de teste.
+ *
+ * Exemplo de uso em `module-jvm/build.gradle.kts`:
+ * ```kotlin
+ * plugins {
+ *     alias(libs.plugins.convention.kotlin.jvm)
+ * }
+ * ```
+ */
 internal abstract class KotlinJvmConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {
